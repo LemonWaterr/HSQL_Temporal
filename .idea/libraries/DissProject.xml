@@ -1,0 +1,10 @@
+<component name="libraryTable">
+  <library name="DissProject">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/out/production/DissProject/gradle-javaPropFile-plugin-0.6.0.jar!/" />
+      <root url="jar://$PROJECT_DIR$/out/production/DissProject/gradle-ivyxml-plugin-0.3.2.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

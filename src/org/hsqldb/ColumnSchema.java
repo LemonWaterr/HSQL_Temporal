@@ -63,6 +63,7 @@ public class ColumnSchema extends ColumnBase implements SchemaObject {
     private OrderedHashSet generatedColumnReferences;
     private Expression     accessor;
     private int            systemPeriodType;
+    private int            applicationPeriodType;
 
     ColumnSchema(HsqlName name, Type type) {
         this.columnName = name;
@@ -365,11 +366,18 @@ public class ColumnSchema extends ColumnBase implements SchemaObject {
                != SchemaObject.PeriodSystemColumnType.PERIOD_ROW_NONE;
     }
 
+    public boolean isApplicationPeriod() {
+        return applicationPeriodType
+                != SchemaObject.PeriodSystemColumnType.PERIOD_ROW_NONE;
+    }
+
     /**
      *  Returns system period type of the column.
      */
-    public int getSystemPeriodType() {
-        return systemPeriodType;
+    public int getSystemPeriodType() { return systemPeriodType; }
+
+    public int getApplicationPeriodType() {
+        return applicationPeriodType;
     }
 
     void setSystemPeriodType(int type) {
@@ -377,7 +385,17 @@ public class ColumnSchema extends ColumnBase implements SchemaObject {
         systemPeriodType = type;
 
         boolean writable =
-            type == SchemaObject.PeriodSystemColumnType.PERIOD_ROW_NONE;
+                type == SchemaObject.PeriodSystemColumnType.PERIOD_ROW_NONE;
+
+        setWriteable(writable);
+    }
+
+    void setApplicationPeriodType(int type) {
+
+        applicationPeriodType = type;
+
+        boolean writable =
+                type == SchemaObject.PeriodSystemColumnType.PERIOD_ROW_NONE;
 
         setWriteable(writable);
     }

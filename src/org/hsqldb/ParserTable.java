@@ -294,12 +294,6 @@ public class ParserTable extends ParserDML {
         setPeriodColumns(table, table.systemPeriod);
         setPeriodColumns(table, table.applicationPeriod);
 
-        // not supported
-        if (table.applicationPeriod != null) {
-            throw Error.error(ErrorCode.X_0A501,
-                              table.applicationPeriod.getName().name);
-        }
-
         return true;
     }
 
@@ -1351,6 +1345,8 @@ public class ParserTable extends ParserDML {
             table.systemPeriod = period;
         } else {
             table.applicationPeriod = period;
+            table.getColumn(table.findColumn((String) period.columnNames.get(0))).setApplicationPeriodType(SchemaObject.PeriodSystemColumnType.PERIOD_ROW_START);
+            table.getColumn(table.findColumn((String) period.columnNames.get(1))).setApplicationPeriodType(SchemaObject.PeriodSystemColumnType.PERIOD_ROW_END);
         }
     }
 

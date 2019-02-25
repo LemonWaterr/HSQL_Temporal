@@ -1,0 +1,10 @@
+<component name="libraryTable">
+  <library name="xml1">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/test-src/org/hsqldb/jdbc/resources/xml/websvc_ref.xml.zip!/" />
+      <root url="jar://$PROJECT_DIR$/test-src/org/hsqldb/jdbc/resources/xml/MyDoc.xml.zip!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

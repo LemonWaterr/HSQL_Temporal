@@ -1446,7 +1446,7 @@ public class StatementDML extends StatementDMQL {
             }
 
             navigator.beforeFirst();
-        }
+    }
 
         OrderedHashSet extraUpdateTables = null;
         OrderedHashSet extraDeleteTables = null;

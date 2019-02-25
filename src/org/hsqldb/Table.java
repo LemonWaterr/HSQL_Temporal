@@ -109,6 +109,8 @@ public class Table extends TableBase implements SchemaObject {
     PeriodDefinition applicationPeriod;
     int              systemPeriodStartColumn;
     int              systemPeriodEndColumn;
+    int              applicationPeriodStartColumn;
+    int              applicationPeriodEndColumn;
 
     //
     public Table(Database database, HsqlName name, int type) {
@@ -1825,6 +1827,8 @@ public class Table extends TableBase implements SchemaObject {
         defaultColumnMap        = new int[columnCount];
         systemPeriodStartColumn = 0;
         systemPeriodEndColumn   = 0;
+        applicationPeriodStartColumn = 0;
+        applicationPeriodEndColumn = 0;
 
         for (int i = 0; i < columnCount; i++) {
             setSingleColumnTypeVars(i);

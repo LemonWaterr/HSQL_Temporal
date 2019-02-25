@@ -61,13 +61,18 @@ public class TempTest {
     public synchronized void doTest() throws SQLException{
         Statement stmt =  conn.createStatement();
 
-        String createSVTable = "CREATE TABLE Emp (ENo INTEGER, Sys_start TIMESTAMP(12) GENERATED ALWAYS AS ROW START, Sys_end TIMESTAMP(12) GENERATED ALWAYS AS ROW END, EName VARCHAR(30), PERIOD FOR SYSTEM_TIME (Sys_start, Sys_end)) WITH SYSTEM VERSIONING";
+        String init = "DROP TABLE Emp";
+        //String createSVTable = "CREATE TABLE Emp (ENo INTEGER, Sys_start TIMESTAMP(12) GENERATED ALWAYS AS ROW START, Sys_end TIMESTAMP(12) GENERATED ALWAYS AS ROW END, EName VARCHAR(30), PERIOD FOR SYSTEM_TIME (Sys_start, Sys_end)) WITH SYSTEM VERSIONING";
+
         String addRow = "INSERT INTO Emp (ENo, EName) VALUES (2, 'Seo')";
+        String updateRow = "UPDATE Emp SET EName = 'Woo' WHERE ENo = 2";
 
-        //String createSVTable = "CREATE TABLE Emp (ENo INTEGER, EName VARCHAR(10))";
+        String createSVTable = "CREATE TABLE Emp (ENo INTEGER, EName VARCHAR(10))";
 
+        stmt.executeUpdate(init);
         stmt.executeUpdate(createSVTable);
         stmt.executeUpdate(addRow);
+        stmt.executeUpdate(updateRow);
 
         stmt.close();
     }
@@ -81,10 +86,27 @@ public class TempTest {
         stmt.close();
     }
 
+    public synchronized void doTest3() throws SQLException{
+        Statement stmt =  conn.createStatement();
+
+        String init = "DROP TABLE Emp";
+        String createAppTable = "CREATE TABLE Emp (ENo INTEGER, EName VARCHAR(30), EStart Date, EEnd DATE, PERIOD FOR EPeriod (EStart, EEnd))";
+
+        String addRow = "INSERT INTO Emp (ENo, EName, EStart, EEnd) VALUES (2, 'Seo', '2019-02-01', '2019-02-25')";
+        //String updateRow = "UPDATE Emp SET EName = 'Woo' WHERE ENo = 2";
+
+        stmt.executeUpdate(init);
+        stmt.executeUpdate(createAppTable);
+        stmt.executeUpdate(addRow);
+        //stmt.executeUpdate(updateRow);
+
+        stmt.close();
+    }
+
     public static void main(String[] args) {
         TempTest test = new TempTest();
         try {
-            test.doTest();
+            test.doTest3();
             test.doTest2();
             test.shutdown();
         } catch (SQLException e1) {
