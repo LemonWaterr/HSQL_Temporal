@@ -115,11 +115,16 @@ public class ExpressionPeriod extends Expression {
     /**
      * For system period
      */
-    void setRangeVariable(RangeVariable rangeVar) {
+    void setRangeVariable(RangeVariable rangeVar, Boolean isSysElseApp) {
 
         Table table = rangeVar.getTable();
 
-        period = table.getSystemPeriod();
+        if(isSysElseApp){
+            period = table.getSystemPeriod();
+        }else{
+            period = table.getApplicationPeriod();
+        }
+
 
         Expression left  = new ExpressionColumn(rangeVar, period.startColumn);
         Expression right = new ExpressionColumn(rangeVar, period.endColumn);

@@ -94,8 +94,9 @@ public class RangeVariable {
     // non-index conditions
     Expression joinCondition;
 
-    // system period condition
+    // period conditions
     ExpressionPeriodOp periodCondition;
+    ExpressionPeriodOp applicationPeriodCondition;
 
     // role based condition
     ExpressionLogical filterCondition;
@@ -225,6 +226,10 @@ public class RangeVariable {
 
     public void setSystemPeriodCondition(ExpressionPeriodOp condition) {
         periodCondition = condition;
+    }
+
+    public void setApplicationPeriodCondition(ExpressionPeriodOp condition) {
+        applicationPeriodCondition = condition;
     }
 
     public void setFilterExpression(Session session, ExpressionLogical expr) {
@@ -1244,6 +1249,7 @@ public class RangeVariable {
         RangeVariableConditions[] whereConditions;
         RangeVariableConditions[] joinConditions;
         ExpressionPeriodOp        periodCondition;
+        ExpressionPeriodOp        applicationPeriodCondition;
         ExpressionLogical         filterCondition;
         int                       condIndex = 0;
 
@@ -1267,6 +1273,7 @@ public class RangeVariable {
             whereConditions    = rangeVar.whereConditions;
             joinConditions     = rangeVar.joinConditions;
             periodCondition    = rangeVar.periodCondition;
+            applicationPeriodCondition = rangeVar.applicationPeriodCondition;
             filterCondition    = rangeVar.filterCondition;
 
             if (rangeVar.isRightJoin) {
@@ -1501,6 +1508,12 @@ public class RangeVariable {
 
                 if (periodCondition != null) {
                     if (!periodCondition.testCondition(session)) {
+                        continue;
+                    }
+                }
+
+                if (applicationPeriodCondition != null) {
+                    if (!applicationPeriodCondition.testCondition(session)) {
                         continue;
                     }
                 }

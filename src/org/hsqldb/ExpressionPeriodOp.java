@@ -131,11 +131,16 @@ public class ExpressionPeriodOp extends ExpressionLogical {
         return isSystemVersionCondition;
     }
 
-    void setSystemRangeVariable(Session session, RangeVariable range) {
+    void setRangeVariable(Session session, RangeVariable range, String sysOrApp) {
 
         ExpressionPeriod period = (ExpressionPeriod) nodes[LEFT];
 
-        period.setRangeVariable(range);
+        if(sysOrApp.equals("system")){
+            period.setRangeVariable(range, true);
+        }else if(sysOrApp.equals("application")){
+            period.setRangeVariable(range, false);
+        }
+
 
         Expression right = nodes[RIGHT];
         HsqlList unresolved = right.resolveColumnReferences(session,

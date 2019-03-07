@@ -2131,6 +2131,7 @@ public class Tokens {
         reservedKeys.put(T_PERCENTILE_CONT, PERCENTILE_CONT);
         reservedKeys.put(T_PERCENTILE_DISC, PERCENTILE_DISC);
         reservedKeys.put(T_PERIOD, PERIOD);
+        reservedKeys.put(T_PORTION, PORTION);
         reservedKeys.put(T_POSITION, POSITION);
         reservedKeys.put(T_POSITION_REGEX, POSITION_REGEX);
         reservedKeys.put(T_POWER, POWER);

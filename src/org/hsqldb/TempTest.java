@@ -58,7 +58,7 @@ public class TempTest {
         }
     }
 
-    public synchronized void doTest() throws SQLException{
+    public synchronized void sysTest() throws SQLException{
         Statement stmt =  conn.createStatement();
 
         String init = "DROP TABLE Emp";
@@ -77,7 +77,8 @@ public class TempTest {
         stmt.close();
     }
 
-    public synchronized void doTest2() throws SQLException{
+
+    public synchronized void selectAll() throws SQLException{
         Statement stmt =  conn.createStatement();
 
         ResultSet rs = stmt.executeQuery("SELECT * FROM Emp");
@@ -86,19 +87,40 @@ public class TempTest {
         stmt.close();
     }
 
-    public synchronized void doTest3() throws SQLException{
+    public synchronized void doTest1() throws SQLException{
         Statement stmt =  conn.createStatement();
 
         String init = "DROP TABLE Emp";
         String createAppTable = "CREATE TABLE Emp (ENo INTEGER, EName VARCHAR(30), EStart Date, EEnd DATE, PERIOD FOR EPeriod (EStart, EEnd))";
 
-        String addRow = "INSERT INTO Emp (ENo, EName, EStart, EEnd) VALUES (2, 'Seo', '2019-02-01', '2019-02-25')";
-        //String updateRow = "UPDATE Emp SET EName = 'Woo' WHERE ENo = 2";
+        String addRow = "INSERT INTO Emp (ENo, EName, EStart, EEnd) VALUES (1, 'A',  '2019-03-01', '2019-03-31')," +
+                                                                            "(2, 'AA', '2019-03-10', '2019-04-10')," +
+                                                                            "(3, 'B',  '2019-05-01', '2019-05-31')";
+        String updateRow = "UPDATE Emp FOR PORTION OF EPeriod FROM DATE '2019-03-01' TO DATE '2019-03-31' SET EName = 'Changed'";
 
         stmt.executeUpdate(init);
         stmt.executeUpdate(createAppTable);
         stmt.executeUpdate(addRow);
-        //stmt.executeUpdate(updateRow);
+        stmt.executeUpdate(updateRow);
+
+        stmt.close();
+    }
+
+    public synchronized void doTest2() throws SQLException{
+        Statement stmt =  conn.createStatement();
+
+        String init = "DROP TABLE Emp";
+        String createTable = "CREATE TABLE Emp (Dummy INTEGER, ENo INTEGER, EName VARCHAR(30))";
+
+        String addRow = "INSERT INTO Emp (Dummy, ENo, EName) VALUES (123, 2, 'Seo')";
+        String addRow2 = "INSERT INTO Emp (Dummy, ENo, EName) VALUES (456, 2, 'Charlie')";
+        String updateRow = "UPDATE Emp SET EName = 'Woo', Dummy = 999 WHERE ENo < 3";
+
+        stmt.executeUpdate(init);
+        stmt.executeUpdate(createTable);
+        stmt.executeUpdate(addRow);
+        stmt.executeUpdate(addRow2);
+        stmt.executeUpdate(updateRow);
 
         stmt.close();
     }
@@ -106,8 +128,8 @@ public class TempTest {
     public static void main(String[] args) {
         TempTest test = new TempTest();
         try {
-            test.doTest3();
-            test.doTest2();
+            test.doTest1();
+            test.selectAll();
             test.shutdown();
         } catch (SQLException e1) {
             e1.printStackTrace();

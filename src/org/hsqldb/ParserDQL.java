@@ -1879,10 +1879,6 @@ public class ParserDQL extends ParserBase {
             XreadQueryApplicationPeriodSpecOrNull(table);
         SimpleName alias = null;
 
-        if (appPeriodSpec != null) {
-            throw Error.error(ErrorCode.X_0A501);
-        }
-
         if (operation != StatementTypes.TRUNCATE) {
             switch (token.tokenType) {
 
@@ -1977,9 +1973,13 @@ public class ParserDQL extends ParserBase {
 
         if (table.isSystemVersioned()) {
             ExpressionPeriodOp sysPeriodSpec = new ExpressionPeriodOp();
-
-            sysPeriodSpec.setSystemRangeVariable(session, range);
+            sysPeriodSpec.setRangeVariable(session, range, "system");
             range.setSystemPeriodCondition(sysPeriodSpec);
+        }
+
+        if (appPeriodSpec != null) {
+            appPeriodSpec.setRangeVariable(session, range, "application");
+            range.setApplicationPeriodCondition(appPeriodSpec);
         }
 
         return range;
@@ -2144,7 +2144,7 @@ public class ParserDQL extends ParserBase {
                                       columnNameList, compileContext);
 
             if (sysPeriodSpec != null) {
-                sysPeriodSpec.setSystemRangeVariable(session, range);
+                sysPeriodSpec.setRangeVariable(session, range, "system");
                 range.setSystemPeriodCondition(sysPeriodSpec);
             }
         }
