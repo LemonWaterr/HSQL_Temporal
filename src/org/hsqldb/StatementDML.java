@@ -47,6 +47,7 @@ import org.hsqldb.persist.PersistentStore;
 import org.hsqldb.result.Result;
 import org.hsqldb.result.ResultConstants;
 import org.hsqldb.result.ResultMetaData;
+import org.hsqldb.types.TimestampData;
 import org.hsqldb.types.Type;
 import org.hsqldb.types.Types;
 
@@ -538,6 +539,15 @@ public class StatementDML extends StatementDMQL {
         }
 
         session.sessionContext.rownum = 1;
+
+        //application period - FOR PORTION OF
+        boolean app_portion = false;
+        TimestampData[] portion_values = new TimestampData[2];
+        if(targetRangeVariables[0].applicationPeriodCondition != null){
+            app_portion = true;
+            portion_values[0] = (TimestampData) targetRangeVariables[0].applicationPeriodCondition.nodes[0].nodes[0].valueData;
+            portion_values[1] = (TimestampData) targetRangeVariables[0].applicationPeriodCondition.nodes[0].nodes[1].valueData;
+        }
 
         int rowCount = 0;
 

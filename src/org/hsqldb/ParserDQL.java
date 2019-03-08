@@ -6650,7 +6650,7 @@ public class ParserDQL extends ParserBase {
         ExpressionPeriod left     = new ExpressionPeriod(period);
         ExpressionPeriod right    = new ExpressionPeriod(pointStart, pointEnd);
 
-        return new ExpressionPeriodOp(OpTypes.RANGE_OVERLAPS, left, right);
+        return new ExpressionPeriodOp(OpTypes.RANGE_CONTAINS, left, right);
     }
 
     ColumnSchema readSimpleColumnName(RangeVariable rangeVar,

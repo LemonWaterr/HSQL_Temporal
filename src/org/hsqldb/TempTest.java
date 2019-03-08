@@ -91,11 +91,16 @@ public class TempTest {
         Statement stmt =  conn.createStatement();
 
         String init = "DROP TABLE Emp";
-        String createAppTable = "CREATE TABLE Emp (ENo INTEGER, EName VARCHAR(30), EStart Date, EEnd DATE, PERIOD FOR EPeriod (EStart, EEnd))";
+        String createAppTable = "CREATE TABLE Emp (ENo INTEGER, EName VARCHAR(30), EStart DATE, EEnd DATE, PERIOD FOR EPeriod (EStart, EEnd))";
 
-        String addRow = "INSERT INTO Emp (ENo, EName, EStart, EEnd) VALUES (1, 'A',  '2019-03-01', '2019-03-31')," +
-                                                                            "(2, 'AA', '2019-03-10', '2019-04-10')," +
-                                                                            "(3, 'B',  '2019-05-01', '2019-05-31')";
+        String addRow = "INSERT INTO Emp (ENo, EName, EStart, EEnd) VALUES (1, 'T1',  '2019-03-01', '2019-03-31')," +
+                                                                            "(2, 'T2', '2019-03-01', '2019-04-10')," +
+                                                                            "(3, 'T3', '2019-02-28', '2019-03-31')," +
+                                                                            "(4, 'T4', '2019-02-28', '2019-04-10')," +
+                                                                            "(5, 'F1', '2019-03-01', '2019-03-20')," +
+                                                                            "(6, 'F2', '2019-03-10', '2019-03-31')," +
+                                                                            "(7, 'F3', '2019-03-10', '2019-03-20')," +
+                                                                            "(8, 'F4', '2019-05-01', '2019-05-31')";
         String updateRow = "UPDATE Emp FOR PORTION OF EPeriod FROM DATE '2019-03-01' TO DATE '2019-03-31' SET EName = 'Changed'";
 
         stmt.executeUpdate(init);

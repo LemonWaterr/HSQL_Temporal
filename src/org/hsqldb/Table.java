@@ -1873,6 +1873,17 @@ public class Table extends TableBase implements SchemaObject {
                 systemPeriodEndColumn = i;
             }
         }
+
+        if (column.isApplicationPeriod()) {
+            int type = column.getApplicationPeriodType();
+
+            if (type == SchemaObject.PeriodSystemColumnType.PERIOD_ROW_START) {
+                applicationPeriodStartColumn = i;
+            } else if (type
+                    == SchemaObject.PeriodSystemColumnType.PERIOD_ROW_END) {
+                applicationPeriodEndColumn = i;
+            }
+        }
     }
 
     /**
