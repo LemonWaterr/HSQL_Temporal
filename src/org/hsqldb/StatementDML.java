@@ -541,10 +541,10 @@ public class StatementDML extends StatementDMQL {
         session.sessionContext.rownum = 1;
 
         //application period - FOR PORTION OF
-        boolean app_portion = false;
+        boolean for_portion_of = false;
         TimestampData[] portion_values = new TimestampData[2];
-        if(targetRangeVariables[0].applicationPeriodCondition != null){
-            app_portion = true;
+        if (targetRangeVariables[0].applicationPeriodCondition != null) {
+            for_portion_of = true;
             portion_values[0] = (TimestampData) targetRangeVariables[0].applicationPeriodCondition.nodes[0].nodes[0].valueData;
             portion_values[1] = (TimestampData) targetRangeVariables[0].applicationPeriodCondition.nodes[0].nodes[1].valueData;
         }
@@ -556,6 +556,13 @@ public class StatementDML extends StatementDMQL {
 
             Row      row     = it.getCurrentRow();
             Object[] newData = row.getDataCopy();
+
+            //make inserts & change newData IF portion_values are not strictly equal to the row's period values
+            if (for_portion_of) {
+                Table currentTable    = (Table) row.getTable();
+                PersistentStore store = currentTable.getRowStore(session);
+                newData               = currentTable.handleForPortionOf(session, store, newData, portion_values);
+            }
 
             getUpdatedData(session, targets, baseTable, updateColumnMap,
                            updateExpressions, colTypes, newData);

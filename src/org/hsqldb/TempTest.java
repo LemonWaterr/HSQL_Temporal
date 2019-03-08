@@ -93,6 +93,7 @@ public class TempTest {
         String init = "DROP TABLE Emp";
         String createAppTable = "CREATE TABLE Emp (ENo INTEGER, EName VARCHAR(30), EStart DATE, EEnd DATE, PERIOD FOR EPeriod (EStart, EEnd))";
 
+        //T1~T4 should be properly updated, and F1~F4 should not be
         String addRow = "INSERT INTO Emp (ENo, EName, EStart, EEnd) VALUES (1, 'T1',  '2019-03-01', '2019-03-31')," +
                                                                             "(2, 'T2', '2019-03-01', '2019-04-10')," +
                                                                             "(3, 'T3', '2019-02-28', '2019-03-31')," +
