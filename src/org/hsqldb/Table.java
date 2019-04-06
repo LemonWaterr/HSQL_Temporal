@@ -105,6 +105,7 @@ public class Table extends TableBase implements SchemaObject {
 
     //
     boolean          isSystemVersioned;
+    boolean          isApplicationPeriodTable;
     PeriodDefinition systemPeriod;
     PeriodDefinition applicationPeriod;
     int              systemPeriodStartColumn;
@@ -1263,6 +1264,8 @@ public class Table extends TableBase implements SchemaObject {
     public PeriodDefinition getApplicationPeriod() {
         return applicationPeriod;
     }
+
+    public boolean isApplicationPeriodTable() {return isApplicationPeriodTable; }
 
     /**
      * Match two valid, equal length, columns arrays for type of columns for

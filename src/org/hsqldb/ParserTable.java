@@ -196,7 +196,7 @@ public class ParserTable extends ParserDML {
                         throw unexpectedToken();
                     }
 
-                    readAndAddPeriod(table);
+                    readAndAddPeriod(table, tempConstraints);
 
                     start     = false;
                     startPart = false;
@@ -1337,7 +1337,7 @@ public class ParserTable extends ParserDML {
      *
      * @param table a table
      */
-    void readAndAddPeriod(Table table) {
+    void readAndAddPeriod(Table table, HsqlArrayList constraintList) {
 
         PeriodDefinition period = readPeriod(table);
 
@@ -1345,8 +1345,35 @@ public class ParserTable extends ParserDML {
             table.systemPeriod = period;
         } else {
             table.applicationPeriod = period;
+
+            //set flag
+            table.isApplicationPeriodTable = true;
+
+            //let period columns to be found by column number
             table.getColumn(table.findColumn((String) period.columnNames.get(0))).setApplicationPeriodType(SchemaObject.PeriodSystemColumnType.PERIOD_ROW_START);
             table.getColumn(table.findColumn((String) period.columnNames.get(1))).setApplicationPeriodType(SchemaObject.PeriodSystemColumnType.PERIOD_ROW_END);
+
+            //auto-create a check constraint to make startTime <= endTime
+            String rawCname = table.getName().name + "_ApplicationPeriod_Check";
+            HsqlName cName = this.database.nameManager.newHsqlName(rawCname, false, SchemaObject.CONSTRAINT);
+            cName.parent = table.getName();
+            cName.setSchemaIfNull(table.getName().schema);
+            Boolean cExists = false;
+            for (Constraint c : table.checkConstraints){
+                if (c.getName().name.equals(rawCname)){
+                    cExists = true;
+                }
+            }
+            if (cExists){
+                this.database.schemaManager.dropConstraint(session, cName, true);
+            }
+
+            Constraint c = new Constraint(cName, null, SchemaObject.ConstraintTypes.CHECK);
+            Expression l = new ExpressionColumn(table.getName().schema.name, table.getName().name, (String) period.columnNames.get(0));
+            Expression r = new ExpressionColumn(table.getName().schema.name, table.getName().name, (String) period.columnNames.get(1));
+            Expression condition = new ExpressionLogical(45, l, r);
+            c.check = condition;
+            constraintList.add(c);
         }
     }
 

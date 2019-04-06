@@ -87,25 +87,28 @@ public class TempTest {
         stmt.close();
     }
 
-    public synchronized void doTest1() throws SQLException{
+    public synchronized void TestUpdateForPeriodOF() throws SQLException{
         Statement stmt =  conn.createStatement();
 
         String init = "DROP TABLE Emp";
-        String createAppTable = "CREATE TABLE Emp (ENo INTEGER, EName VARCHAR(30), EStart DATE, EEnd DATE, PERIOD FOR EPeriod (EStart, EEnd))";
+        String createAppTable = "CREATE TABLE Emp (TrigOut VARCHAR(30) NULL, ENo INTEGER, EName VARCHAR(30), EStart DATE, EEnd DATE, PERIOD FOR EPeriod (EStart, EEnd))";
+
+        //String createTrigger = "CREATE TRIGGER testTrigInsert AFTER INSERT ON Emp FOR EACH ROW BEGIN ATOMIC INSERT INTO Emp VALUES ('trigger', 999, 'Trig',  '2011-01-01', '2011-02-01'); END";
 
         //T1~T4 should be properly updated, and F1~F4 should not be
-        String addRow = "INSERT INTO Emp (ENo, EName, EStart, EEnd) VALUES (1, 'T1',  '2019-03-01', '2019-03-31')," +
-                                                                            "(2, 'T2', '2019-03-01', '2019-04-10')," +
-                                                                            "(3, 'T3', '2019-02-28', '2019-03-31')," +
-                                                                            "(4, 'T4', '2019-02-28', '2019-04-10')," +
-                                                                            "(5, 'F1', '2019-03-01', '2019-03-20')," +
-                                                                            "(6, 'F2', '2019-03-10', '2019-03-31')," +
-                                                                            "(7, 'F3', '2019-03-10', '2019-03-20')," +
-                                                                            "(8, 'F4', '2019-05-01', '2019-05-31')";
+        String addRow = "INSERT INTO Emp (TrigOut, ENo, EName, EStart, EEnd) VALUES ('none', 1, 'T1',  '2019-03-01', '2019-03-31')," +
+                                                                            "('none', 2, 'T2', '2019-03-01', '2019-04-10')," +
+                                                                            "('none', 3, 'T3', '2019-02-28', '2019-03-31')," +
+                                                                            "('none', 4, 'T4', '2019-02-28', '2019-04-10')," +
+                                                                            "('none', 5, 'F1', '2019-03-01', '2019-03-20')," +
+                                                                            "('none', 6, 'F2', '2019-03-10', '2019-03-31')," +
+                                                                            "('none', 7, 'F3', '2019-03-10', '2019-03-20')," +
+                                                                            "('none', 8, 'F4', '2019-05-01', '2019-05-31')";
         String updateRow = "UPDATE Emp FOR PORTION OF EPeriod FROM DATE '2019-03-01' TO DATE '2019-03-31' SET EName = 'Changed'";
 
         stmt.executeUpdate(init);
         stmt.executeUpdate(createAppTable);
+        //stmt.executeUpdate(createTrigger);
         stmt.executeUpdate(addRow);
         stmt.executeUpdate(updateRow);
 
@@ -131,10 +134,54 @@ public class TempTest {
         stmt.close();
     }
 
+
+    public synchronized void TestConstraint() throws SQLException{
+        Statement stmt =  conn.createStatement();
+
+        String init = "DROP TABLE Emp";
+        String createTable = "CREATE TABLE Emp (Num1 INTEGER, Num2 INTEGER, EName VARCHAR(30), CONSTRAINT CHK CHECK (Num1 < Num2) )";
+
+        String dropcon = "ALTER TABLE Emp DROP CONSTRAINT CHK";
+
+        //String addRow = "INSERT INTO Emp (Num1, Num2, EName) VALUES (3, 4, 'Valid')";
+        //String addRow2 = "INSERT INTO Emp (Num1, Num2, EName) VALUES (90, 10, 'Invalid')";
+        //String updateRow = "UPDATE Emp SET EName = 'Invalid', Num1 = 5 WHERE Num1 == 3";
+
+        stmt.executeUpdate(init);
+        stmt.executeUpdate(createTable);
+        stmt.executeUpdate(dropcon);
+        //stmt.executeUpdate(addRow);
+        //stmt.executeUpdate(addRow2);
+        //stmt.executeUpdate(updateRow);
+
+        stmt.close();
+    }
+
+    public synchronized void TestConstraint2() throws SQLException{
+        Statement stmt =  conn.createStatement();
+
+        String init = "DROP TABLE Emp";
+        String createAppTable = "CREATE TABLE Emp (TrigOut VARCHAR(30) NULL, ENo INTEGER, EName VARCHAR(30), EStart DATE, EEnd DATE, PERIOD FOR EPeriod (EStart, EEnd))";
+
+        //T1~T4 should be properly updated, and F1~F4 should not be
+        //String addRow = "INSERT INTO Emp (TrigOut, ENo, EName, EStart, EEnd) VALUES ('none', 1, 'T1', '2019-03-01', '2019-03-31')";
+        String addRow = "INSERT INTO Emp (TrigOut, ENo, EName, EStart, EEnd) VALUES ('none', 1, 'T1', '2019-03-31', '2019-03-01')";
+        //String updateRow = "UPDATE Emp SET EStart = '2019-04-01'";
+
+        stmt.executeUpdate(init);
+        stmt.executeUpdate(createAppTable);
+        //stmt.executeUpdate(createTrigger);
+        stmt.executeUpdate(addRow);
+        //stmt.executeUpdate(updateRow);
+
+        stmt.close();
+    }
+
+
     public static void main(String[] args) {
         TempTest test = new TempTest();
         try {
-            test.doTest1();
+            test.TestUpdateForPeriodOF();
             test.selectAll();
             test.shutdown();
         } catch (SQLException e1) {
