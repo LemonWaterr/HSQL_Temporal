@@ -115,6 +115,34 @@ public class TempTest {
         stmt.close();
     }
 
+    public synchronized void TestDeleteForPeriodOF() throws SQLException{
+        Statement stmt =  conn.createStatement();
+
+        String init = "DROP TABLE Emp";
+        String createAppTable = "CREATE TABLE Emp (TrigOut VARCHAR(30) NULL, ENo INTEGER, EName VARCHAR(30), EStart DATE, EEnd DATE, PERIOD FOR EPeriod (EStart, EEnd))";
+
+        //String createTrigger = "CREATE TRIGGER testTrigInsert AFTER INSERT ON Emp FOR EACH ROW BEGIN ATOMIC INSERT INTO Emp VALUES ('trigger', 999, 'Trig',  '2011-01-01', '2011-02-01'); END";
+
+        //T1~T4 should be properly updated, and F1~F4 should not be
+        String addRow = "INSERT INTO Emp (TrigOut, ENo, EName, EStart, EEnd) VALUES ('none', 1, 'T1',  '2019-03-01', '2019-03-31')," +
+                "('none', 2, 'T2', '2019-03-01', '2019-04-10')," +
+                "('none', 3, 'T3', '2019-02-28', '2019-03-31')," +
+                "('none', 4, 'T4', '2019-02-28', '2019-04-10')," +
+                "('none', 5, 'F1', '2019-03-01', '2019-03-20')," +
+                "('none', 6, 'F2', '2019-03-10', '2019-03-31')," +
+                "('none', 7, 'F3', '2019-03-10', '2019-03-20')," +
+                "('none', 8, 'F4', '2019-05-01', '2019-05-31')";
+        String deleteRow = "DELETE FROM Emp FOR PORTION OF EPeriod FROM DATE '2019-03-01' TO DATE '2019-03-31'";
+
+        stmt.executeUpdate(init);
+        stmt.executeUpdate(createAppTable);
+        //stmt.executeUpdate(createTrigger);
+        stmt.executeUpdate(addRow);
+        stmt.executeUpdate(deleteRow);
+
+        stmt.close();
+    }
+
     public synchronized void doTest2() throws SQLException{
         Statement stmt =  conn.createStatement();
 
@@ -181,7 +209,7 @@ public class TempTest {
     public static void main(String[] args) {
         TempTest test = new TempTest();
         try {
-            test.TestUpdateForPeriodOF();
+            test.TestDeleteForPeriodOF();
             test.selectAll();
             test.shutdown();
         } catch (SQLException e1) {

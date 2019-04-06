@@ -2909,7 +2909,7 @@ public class Table extends TableBase implements SchemaObject {
     }
 
     /**
-     * Method for inserting splitted rows and returning newData row for application-time period table when update/delete FOR PERIOD OF some period.
+     * Method for inserting splitted rows and returning newData row for application-time period table when updating/deleting FOR PERIOD OF some period.
      */
     Object[] handleForPortionOf(Session session, PersistentStore store, Object[] data,
                                 TimestampData[] portion) {
