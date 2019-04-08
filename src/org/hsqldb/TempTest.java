@@ -87,6 +87,15 @@ public class TempTest {
         stmt.close();
     }
 
+    public synchronized void TestAppQuery() throws SQLException{
+        Statement stmt =  conn.createStatement();
+
+        ResultSet rs = stmt.executeQuery("SELECT * FROM Emp WHERE EPeriod IMMEDIATELY PRECEDES PERIOD (DATE '2019-03-01', DATE '2019-03-31')");
+        dump(rs);
+
+        stmt.close();
+    }
+
     public synchronized void TestUpdateForPeriodOF() throws SQLException{
         Statement stmt =  conn.createStatement();
 
@@ -110,7 +119,7 @@ public class TempTest {
         stmt.executeUpdate(createAppTable);
         //stmt.executeUpdate(createTrigger);
         stmt.executeUpdate(addRow);
-        stmt.executeUpdate(updateRow);
+        //stmt.executeUpdate(updateRow);
 
         stmt.close();
     }
@@ -143,7 +152,8 @@ public class TempTest {
         stmt.close();
     }
 
-    public synchronized void doTest2() throws SQLException{
+
+    public synchronized void testSimple() throws SQLException{
         Statement stmt =  conn.createStatement();
 
         String init = "DROP TABLE Emp";
@@ -155,9 +165,9 @@ public class TempTest {
 
         stmt.executeUpdate(init);
         stmt.executeUpdate(createTable);
-        stmt.executeUpdate(addRow);
-        stmt.executeUpdate(addRow2);
-        stmt.executeUpdate(updateRow);
+        //stmt.executeUpdate(addRow);
+        //stmt.executeUpdate(addRow2);
+        //stmt.executeUpdate(updateRow);
 
         stmt.close();
     }
@@ -209,8 +219,10 @@ public class TempTest {
     public static void main(String[] args) {
         TempTest test = new TempTest();
         try {
-            test.TestDeleteForPeriodOF();
+            test.testSimple();
+            //test.TestUpdateForPeriodOF();
             test.selectAll();
+            //test.TestAppQuery();
             test.shutdown();
         } catch (SQLException e1) {
             e1.printStackTrace();
