@@ -294,6 +294,14 @@ public class ParserTable extends ParserDML {
         setPeriodColumns(table, table.systemPeriod);
         setPeriodColumns(table, table.applicationPeriod);
 
+
+        if(table.isApplicationPeriodTable() && ((Constraint) tempConstraints.get(0)).getConstraintType() == SchemaObject.ConstraintTypes.PRIMARY_KEY){
+            //if table is application period table && primary key is defined in the query
+            ((Constraint) tempConstraints.get(0)).mainColSet.add(table.applicationPeriod.getStartColumn().getNameString());
+            ((Constraint) tempConstraints.get(0)).mainColSet.add(table.applicationPeriod.getEndColumn().getNameString());
+        }
+
+
         return true;
     }
 
@@ -1353,12 +1361,14 @@ public class ParserTable extends ParserDML {
             table.getColumn(table.findColumn((String) period.columnNames.get(0))).setApplicationPeriodType(SchemaObject.PeriodSystemColumnType.PERIOD_ROW_START);
             table.getColumn(table.findColumn((String) period.columnNames.get(1))).setApplicationPeriodType(SchemaObject.PeriodSystemColumnType.PERIOD_ROW_END);
 
+            /*
             //auto-create a check constraint to make startTime <= endTime
-            String rawCname = table.getName().name + "_ApplicationPeriod_Check";
+            String rawCname = table.getName().name + "_APPPERIOD_CHK";
             HsqlName cName = this.database.nameManager.newHsqlName(rawCname, false, SchemaObject.CONSTRAINT);
             cName.parent = table.getName();
             cName.setSchemaIfNull(table.getName().schema);
             Boolean cExists = false;
+
             for (Constraint c : table.checkConstraints){
                 if (c.getName().name.equals(rawCname)){
                     cExists = true;
@@ -1369,11 +1379,12 @@ public class ParserTable extends ParserDML {
             }
 
             Constraint c = new Constraint(cName, null, SchemaObject.ConstraintTypes.CHECK);
-            Expression l = new ExpressionColumn(table.getName().schema.name, table.getName().name, (String) period.columnNames.get(0));
-            Expression r = new ExpressionColumn(table.getName().schema.name, table.getName().name, (String) period.columnNames.get(1));
+            Expression l = new ExpressionColumn(null, null, (String) period.columnNames.get(0));
+            Expression r = new ExpressionColumn(null, null, (String) period.columnNames.get(1));
             Expression condition = new ExpressionLogical(45, l, r);
             c.check = condition;
             constraintList.add(c);
+            */
         }
     }
 

@@ -152,21 +152,49 @@ public class TempTest {
         stmt.close();
     }
 
+    public synchronized void testPK() throws SQLException{
+        Statement stmt =  conn.createStatement();
+
+        String init = "DROP TABLE Emp";
+        String createAppTable = "CREATE TABLE Emp (TrigOut VARCHAR(30) NULL, ENo INTEGER, EName VARCHAR(30), EStart DATE, EEnd DATE, PERIOD FOR EPeriod (EStart, EEnd), PRIMARY KEY(ENo))";
+
+        //String createTrigger = "CREATE TRIGGER testTrigInsert AFTER INSERT ON Emp FOR EACH ROW BEGIN ATOMIC INSERT INTO Emp VALUES ('trigger', 999, 'Trig',  '2011-01-01', '2011-02-01'); END";
+
+        //T1~T4 should be properly updated, and F1~F4 should not be
+        String addRow = "INSERT INTO Emp (TrigOut, ENo, EName, EStart, EEnd) VALUES ('none', 1, 'T1',  '2019-03-01', '2019-03-31')," +
+                "('none', 2, 'T2', '2019-03-01', '2019-04-10')," +
+                "('none', 3, 'T3', '2019-02-28', '2019-03-31')," +
+                "('none', 4, 'T4', '2019-02-28', '2019-04-10')," +
+                "('none', 5, 'F1', '2019-03-01', '2019-03-20')," +
+                "('none', 6, 'F2', '2019-03-10', '2019-03-31')," +
+                "('none', 7, 'F3', '2019-03-10', '2019-03-20')," +
+                "('none', 8, 'F4', '2019-05-01', '2019-05-31')";
+
+        String addViolation = "INSERT INTO Emp (TrigOut, ENo, EName, EStart, EEnd) VALUES ('none', 1, 'T11',  '2019-03-01', '2019-04-30')";
+
+        stmt.executeUpdate(init);
+        stmt.executeUpdate(createAppTable);
+        //stmt.executeUpdate(createTrigger);
+        stmt.executeUpdate(addRow);
+        stmt.executeUpdate(addViolation);
+
+        stmt.close();
+    }
 
     public synchronized void testSimple() throws SQLException{
         Statement stmt =  conn.createStatement();
 
         String init = "DROP TABLE Emp";
-        String createTable = "CREATE TABLE Emp (Dummy INTEGER, ENo INTEGER, EName VARCHAR(30))";
+        String createTable = "CREATE TABLE Emp (Dummy INTEGER, ENo INTEGER, EName VARCHAR(30), CONSTRAINT TESTCONST1 CHECK(Dummy > ENo), CONSTRAINT TESTCONST2 CHECK(Dummy > 100))";
 
         String addRow = "INSERT INTO Emp (Dummy, ENo, EName) VALUES (123, 2, 'Seo')";
         String addRow2 = "INSERT INTO Emp (Dummy, ENo, EName) VALUES (456, 2, 'Charlie')";
         String updateRow = "UPDATE Emp SET EName = 'Woo', Dummy = 999 WHERE ENo < 3";
 
-        stmt.executeUpdate(init);
+        //stmt.executeUpdate(init);
         stmt.executeUpdate(createTable);
-        //stmt.executeUpdate(addRow);
-        //stmt.executeUpdate(addRow2);
+        stmt.executeUpdate(addRow);
+        stmt.executeUpdate(addRow2);
         //stmt.executeUpdate(updateRow);
 
         stmt.close();
@@ -219,7 +247,7 @@ public class TempTest {
     public static void main(String[] args) {
         TempTest test = new TempTest();
         try {
-            test.testSimple();
+            test.testPK();
             //test.TestUpdateForPeriodOF();
             test.selectAll();
             //test.TestAppQuery();

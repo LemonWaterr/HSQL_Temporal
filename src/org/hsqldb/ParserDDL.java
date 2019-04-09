@@ -638,16 +638,19 @@ public class ParserDDL extends ParserRoutine {
                         name.schema.name, name.type);
         }
 
+        /*
         //drop ApplicationPeriod_Check constraint automatically
         if (object.getType() == SchemaObject.TABLE){
             Table tempTable = (Table) object;
             if (tempTable.isApplicationPeriodTable()){
-                HsqlName cName = this.database.nameManager.newHsqlName(tempTable.getName().name + "_ApplicationPeriod_Check", false, SchemaObject.CONSTRAINT);
+                HsqlName cName = this.database.nameManager.newHsqlName(tempTable.getName().name + "_APPPERIOD_CHK", false, SchemaObject.CONSTRAINT);
                 cName.parent = tempTable.getName();
                 cName.setSchemaIfNull(tempTable.getName().schema);
                 this.database.schemaManager.dropConstraint(session, cName, true);
             }
         }
+        */
+
 
         if (!ifExists && useIfExists && token.tokenType == Tokens.IF) {
             read();
