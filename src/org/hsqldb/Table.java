@@ -106,12 +106,14 @@ public class Table extends TableBase implements SchemaObject {
     //
     boolean          isSystemVersioned;
     boolean          isApplicationPeriodTable;
+    boolean          withoutOverlaps;
     PeriodDefinition systemPeriod;
     PeriodDefinition applicationPeriod;
     int              systemPeriodStartColumn;
     int              systemPeriodEndColumn;
     int              applicationPeriodStartColumn;
     int              applicationPeriodEndColumn;
+
 
     //
     public Table(Database database, HsqlName name, int type) {

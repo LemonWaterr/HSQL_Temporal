@@ -809,7 +809,7 @@ public class ParserDQL extends ParserBase {
     HsqlName[] readColumnNames(HsqlName tableName) {
 
         BitMap         quotedFlags = new BitMap(0, true);
-        OrderedHashSet set         = readColumnNames(quotedFlags, false);
+        OrderedHashSet set         = readColumnNames(quotedFlags, false, null);
         HsqlName[]     colList     = new HsqlName[set.size()];
 
         for (int i = 0; i < colList.length; i++) {
@@ -824,25 +824,37 @@ public class ParserDQL extends ParserBase {
     }
 
     OrderedHashSet readColumnNames(boolean readAscDesc) {
-        return readColumnNames(null, readAscDesc);
+        return readColumnNames(null, readAscDesc, null);
     }
 
-    OrderedHashSet readColumnNames(BitMap quotedFlags, boolean readAscDesc) {
+    //for Application Period Table DDL 'without overlaps' to set flag on table
+    OrderedHashSet readColumnNames(Table table) {
+        return readColumnNames(null, false, table);
+    }
+
+    OrderedHashSet readColumnNames(BitMap quotedFlags, boolean readAscDesc, Table table) {
 
         readThis(Tokens.OPENBRACKET);
 
         OrderedHashSet set = new OrderedHashSet();
 
-        readColumnNameList(set, quotedFlags, readAscDesc);
+        readColumnNameList(set, quotedFlags, readAscDesc, table);
         readThis(Tokens.CLOSEBRACKET);
 
         return set;
     }
 
     void readColumnNameList(OrderedHashSet set, BitMap quotedFlags,
-                            boolean readAscDesc) {
+                            boolean readAscDesc, Table table) {
 
         int i = 0;
+
+        String appPeriodName = null;
+        if(table != null){
+            if(table.isApplicationPeriodTable()){
+                appPeriodName = table.getApplicationPeriod().periodName.name;
+            }
+        }
 
         while (true) {
             if (session.isProcessingScript()) {
@@ -863,7 +875,17 @@ public class ParserDQL extends ParserBase {
                 quotedFlags.setValue(i, isDelimitedIdentifier());
             }
 
+            String currentToken = token.tokenString;
             read();
+
+            if(appPeriodName != null){
+                if(currentToken.equals(appPeriodName)){
+                    if(readIfThis(Tokens.WITHOUT)){
+                        readThis(Tokens.OVERLAPS);
+                        table.withoutOverlaps = true;
+                    }
+                }
+            }
 
             i++;
 
@@ -887,7 +909,7 @@ public class ParserDQL extends ParserBase {
         BitMap columnNameQuoted = new BitMap(0, true);
 
         readThis(Tokens.OPENBRACKET);
-        readColumnNameList(set, columnNameQuoted, false);
+        readColumnNameList(set, columnNameQuoted, false, null);
         readThis(Tokens.CLOSEBRACKET);
 
         SimpleName[] columnNameList = new SimpleName[set.size()];
@@ -6826,7 +6848,7 @@ public class ParserDQL extends ParserBase {
 
                     colNames = new OrderedHashSet();
 
-                    readColumnNameList(colNames, null, false);
+                    readColumnNameList(colNames, null, false, null);
                 }
 
                 if (database.sqlSyntaxOra) {

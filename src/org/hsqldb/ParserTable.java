@@ -294,9 +294,10 @@ public class ParserTable extends ParserDML {
         setPeriodColumns(table, table.systemPeriod);
         setPeriodColumns(table, table.applicationPeriod);
 
-
         if(table.isApplicationPeriodTable() && ((Constraint) tempConstraints.get(0)).getConstraintType() == SchemaObject.ConstraintTypes.PRIMARY_KEY){
-            //if table is application period table && primary key is defined in the query
+            if(((Constraint) tempConstraints.get(0)).mainColSet.contains(table.applicationPeriod.getName().name)){
+                ((Constraint) tempConstraints.get(0)).mainColSet.remove(table.applicationPeriod.getName().name);
+            }
             ((Constraint) tempConstraints.get(0)).mainColSet.add(table.applicationPeriod.getStartColumn().getNameString());
             ((Constraint) tempConstraints.get(0)).mainColSet.add(table.applicationPeriod.getEndColumn().getNameString());
         }
@@ -1491,7 +1492,7 @@ public class ParserTable extends ParserDML {
                             schemaObject.getName(), SchemaObject.CONSTRAINT);
                 }
 
-                OrderedHashSet set = readColumnNames(false);
+                OrderedHashSet set = readColumnNames((Table) schemaObject);
                 Constraint c =
                     new Constraint(constName, set,
                                    SchemaObject.ConstraintTypes.PRIMARY_KEY);

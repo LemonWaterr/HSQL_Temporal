@@ -922,6 +922,7 @@ public class IndexAVL implements Index {
                 }
             }
 
+
             if (compare == 0) {
                 Constraint c = null;
 

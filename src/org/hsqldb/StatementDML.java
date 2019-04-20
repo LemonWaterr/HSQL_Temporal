@@ -31,6 +31,7 @@
 
 package org.hsqldb;
 
+import com.sun.org.apache.xalan.internal.xsltc.cmdline.Compile;
 import org.hsqldb.HsqlNameManager.HsqlName;
 import org.hsqldb.ParserDQL.CompileContext;
 import org.hsqldb.error.Error;
@@ -47,6 +48,7 @@ import org.hsqldb.persist.PersistentStore;
 import org.hsqldb.result.Result;
 import org.hsqldb.result.ResultConstants;
 import org.hsqldb.result.ResultMetaData;
+import org.hsqldb.types.NumberType;
 import org.hsqldb.types.TimestampData;
 import org.hsqldb.types.Type;
 import org.hsqldb.types.Types;
@@ -84,6 +86,8 @@ public class StatementDML extends StatementDMQL {
 
     /** ResultMetaData for generated values */
     ResultMetaData generatedResultMetaData;
+
+    CompileContext tempCompileContext;
 
     public StatementDML(int type, int group, HsqlName schemaName) {
         super(type, group, schemaName);
@@ -145,6 +149,8 @@ public class StatementDML extends StatementDMQL {
         setDatabaseObjects(session, compileContext);
         checkAccessRights(session);
         targetRange.addAllColumns();
+
+        tempCompileContext = compileContext;
     }
 
     /**
@@ -556,6 +562,7 @@ public class StatementDML extends StatementDMQL {
 
             Row      row     = it.getCurrentRow();
             Object[] newData = row.getDataCopy();
+            Object[] oldData = row.getDataCopy();
 
             //make inserts & change newData IF portion_values are not strictly equal to the row's period values
             if (for_portion_of) {
@@ -566,6 +573,11 @@ public class StatementDML extends StatementDMQL {
 
             getUpdatedData(session, targets, baseTable, updateColumnMap,
                            updateExpressions, colTypes, newData);
+
+            if(targetTable.withoutOverlaps){
+                performWithoutOverlapsCheck(session, targetTable, tempCompileContext, oldData, newData);
+            }
+
             rowset.addRow(session, row, newData, colTypes, updateColumnMap);
 
             session.sessionContext.rownum++;
@@ -1784,6 +1796,98 @@ public class StatementDML extends StatementDMQL {
             }
 
             refiterator.release();
+        }
+    }
+
+    void performWithoutOverlapsCheck(Session session, Table table, CompileContext compileContext, Object[] oldData, Object[] newData){
+
+        int[] pkIndices = table.getPrimaryKey();
+        Type[] colTypes = table.getColumnTypes();
+
+        System.out.print("newData:  ");
+        for(Object val : newData){
+            System.out.print(val);
+            System.out.print("  ");
+        }
+        System.out.println("");
+
+        System.out.print("oldData:  ");
+        for(Object val : oldData){
+            System.out.print(val);
+            System.out.print("  ");
+        }
+        System.out.println("");
+
+        RangeVariable overlapRV = new RangeVariable(table, null, null, null, compileContext);
+        RangeVariable[] overlapRVs = new RangeVariable[]{ overlapRV };
+        ExpressionLogical overlapCon = null;
+        ExpressionLogical oldDataCon = null;
+
+        //add PKs to condition
+        for(int i : pkIndices){
+            if(oldData != null){
+                oldDataCon = addConditionForWithoutOverlaps(i, oldDataCon, table, overlapRV, oldData[i], colTypes[i]);
+            }
+
+            if(i == table.applicationPeriodStartColumn || i == table.applicationPeriodEndColumn){
+                continue;
+            }else{
+                overlapCon = addConditionForWithoutOverlaps(i, overlapCon, table, overlapRV, newData[i], colTypes[i]);
+            }
+        }
+
+        //Negate oldDataCon and AND it to overlapCon
+        if(oldDataCon != null && overlapCon != null){
+            oldDataCon = new ExpressionLogical(OpTypes.NOT, oldDataCon);
+            overlapCon = new ExpressionLogical(OpTypes.AND, oldDataCon, overlapCon);
+        }
+        overlapRV.joinCondition = overlapCon;
+
+        //add overlap to condition
+        ExpressionColumn startCol = new ExpressionColumn(null, null, table.getApplicationPeriod().getStartColumn().getNameString());
+        ExpressionColumn endCol   = new ExpressionColumn(null, null, table.getApplicationPeriod().getEndColumn().getNameString());
+        int[] periodIndices = {table.applicationPeriodStartColumn, table.applicationPeriodEndColumn};
+        startCol.setAttributesAsColumn(overlapRV, periodIndices[0]);
+        endCol.setAttributesAsColumn(overlapRV, periodIndices[1]);
+        Expression startVal =  new ExpressionValue(newData[periodIndices[0]], colTypes[periodIndices[0]]);
+        Expression endVal =  new ExpressionValue(newData[periodIndices[1]], colTypes[periodIndices[1]]);
+        ExpressionPeriod left = new ExpressionPeriod(table.getApplicationPeriod());
+        ExpressionPeriod right = new ExpressionPeriod(startVal, endVal);
+        ExpressionPeriodOp periodCondition = new ExpressionPeriodOp(OpTypes.RANGE_OVERLAPS, left, right);
+        periodCondition.setRangeVariable(session, overlapRV, "application");
+        overlapRV.setApplicationPeriodCondition(periodCondition);
+
+        //resolver
+        RangeVariableResolver resolver = new RangeVariableResolver(session,
+                overlapRVs, null, compileContext, false);
+        resolver.processConditions();
+        overlapRVs = resolver.rangeVariables;
+        RangeIterator overlapIt = RangeVariable.getIterator(session, overlapRVs);
+
+        if(overlapIt.next()){
+            System.out.println("WithoutOverlaps: error should be thrown");
+
+            Row row = overlapIt.getCurrentRow();
+            Object[] vals = row.getDataCopy();
+            for(Object val : vals){
+                System.out.print(val);
+                System.out.print("  ");
+            }
+            System.out.println("");
+        }
+    }
+
+    ExpressionLogical addConditionForWithoutOverlaps(int i, ExpressionLogical overlapCon, Table table, RangeVariable overlapRV, Object val, Type type){
+
+        ExpressionColumn overlapCol = new ExpressionColumn(null, null, table.getColumn(i).getNameString());
+        overlapCol.setAttributesAsColumn(overlapRV, i);
+        Expression overlapVal =  new ExpressionValue(val, type);
+        ExpressionLogical result = new ExpressionLogical(OpTypes.EQUAL, overlapCol, overlapVal);
+
+        if(overlapCon == null){
+            return result;
+        }else{
+            return new ExpressionLogical(OpTypes.AND, overlapCon, result);
         }
     }
 

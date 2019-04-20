@@ -2146,7 +2146,7 @@ public class ParserRoutine extends ParserTable {
 
                     columns = new OrderedHashSet();
 
-                    readColumnNameList(columns, null, false);
+                    readColumnNameList(columns, null, false, null);
                 }
                 break;
 
