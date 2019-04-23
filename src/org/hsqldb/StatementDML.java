@@ -53,6 +53,11 @@ import org.hsqldb.types.TimestampData;
 import org.hsqldb.types.Type;
 import org.hsqldb.types.Types;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+
 /**
  * Implementation of Statement for DML statements.<p>
  *
@@ -556,6 +561,7 @@ public class StatementDML extends StatementDMQL {
         }
 
         int rowCount = 0;
+        HashMap<List<Object>, List<TimestampData[]>> newRowStore = new HashMap<>();
 
         while (it.next()) {
             session.sessionData.startRowProcessing();
@@ -575,7 +581,7 @@ public class StatementDML extends StatementDMQL {
                            updateExpressions, colTypes, newData);
 
             if(targetTable.withoutOverlaps){
-                performWithoutOverlapsCheck(session, targetTable, tempCompileContext, oldData, newData);
+                performWithoutOverlapsCheck(newRowStore, session, targetTable, tempCompileContext, oldData, newData);
             }
 
             rowset.addRow(session, row, newData, colTypes, updateColumnMap);
@@ -921,8 +927,14 @@ public class StatementDML extends StatementDMQL {
             newData.beforeFirst();
         }
 
+        HashMap<List<Object>, List<TimestampData[]>> newRowStore = new HashMap<>();
+
         while (newData.next()) {
             Object[] data = newData.getCurrent();
+
+            if(targetTable.withoutOverlaps){
+                performWithoutOverlapsCheck(newRowStore, session, targetTable, tempCompileContext, null, data);
+            }
 
             // for identity using global sequence
             session.sessionData.startRowProcessing();
@@ -976,6 +988,10 @@ public class StatementDML extends StatementDMQL {
         if (baseTable.triggerLists[Trigger.INSERT_BEFORE_ROW].length > 0) {
             baseTable.fireTriggers(session, Trigger.INSERT_BEFORE_ROW, null,
                                    data, null);
+        }
+
+        if(targetTable.withoutOverlaps){
+            performWithoutOverlapsCheck(null, session, targetTable, tempCompileContext, null, data);
         }
 
         baseTable.insertSingleRow(session, store, data, null);
@@ -1799,24 +1815,14 @@ public class StatementDML extends StatementDMQL {
         }
     }
 
-    void performWithoutOverlapsCheck(Session session, Table table, CompileContext compileContext, Object[] oldData, Object[] newData){
+    void performWithoutOverlapsCheck(HashMap<List<Object>, List<TimestampData[]>> rowStore, Session session, Table table, CompileContext compileContext, Object[] oldData, Object[] newData){
+
+        if(rowStore != null){
+            performWithoutOverlapsCheckOnNewRows(rowStore, table, newData);
+        }
 
         int[] pkIndices = table.getPrimaryKey();
         Type[] colTypes = table.getColumnTypes();
-
-        System.out.print("newData:  ");
-        for(Object val : newData){
-            System.out.print(val);
-            System.out.print("  ");
-        }
-        System.out.println("");
-
-        System.out.print("oldData:  ");
-        for(Object val : oldData){
-            System.out.print(val);
-            System.out.print("  ");
-        }
-        System.out.println("");
 
         RangeVariable overlapRV = new RangeVariable(table, null, null, null, compileContext);
         RangeVariable[] overlapRVs = new RangeVariable[]{ overlapRV };
@@ -1864,17 +1870,20 @@ public class StatementDML extends StatementDMQL {
         overlapRVs = resolver.rangeVariables;
         RangeIterator overlapIt = RangeVariable.getIterator(session, overlapRVs);
 
-        if(overlapIt.next()){
-            System.out.println("WithoutOverlaps: error should be thrown");
 
-            Row row = overlapIt.getCurrentRow();
-            Object[] vals = row.getDataCopy();
-            for(Object val : vals){
-                System.out.print(val);
-                System.out.print("  ");
+        if(overlapIt.next()){
+            String msg = "Period Without Overlaps condition violated by row (DateTime in seconds): ";
+            for(Object val : newData){
+                if(val instanceof TimestampData){
+                    msg += ((TimestampData) val).getSeconds();
+                }else{
+                    msg += val.toString();
+                }
+                msg += " | ";
             }
-            System.out.println("");
+            throw Error.error(ErrorCode.X_23505, msg);
         }
+
     }
 
     ExpressionLogical addConditionForWithoutOverlaps(int i, ExpressionLogical overlapCon, Table table, RangeVariable overlapRV, Object val, Type type){
@@ -1889,6 +1898,44 @@ public class StatementDML extends StatementDMQL {
         }else{
             return new ExpressionLogical(OpTypes.AND, overlapCon, result);
         }
+    }
+
+    void performWithoutOverlapsCheckOnNewRows(HashMap<List<Object>,List<TimestampData[]>> rowStore, Table table, Object[] data){
+        List<Object> key = new ArrayList<>();
+        int[] periodIndices = {table.applicationPeriodStartColumn, table.applicationPeriodEndColumn};
+        TimestampData[] period_data = {(TimestampData) data[periodIndices[0]], (TimestampData) data[periodIndices[1]]};
+
+        for(int i : table.getPrimaryKey()){
+            if(i == periodIndices[0] || i == periodIndices[1]) {
+                continue;
+            }
+            key.add(data[i]);
+        }
+
+        if(!rowStore.containsKey(key)){
+            ArrayList<TimestampData[]> tempList = new ArrayList<>();
+            tempList.add(period_data);
+            rowStore.put(key, tempList);
+        }else{
+            List<TimestampData[]> periods = rowStore.get(key);
+            for(TimestampData[] period : periods){
+                if(period[0].compareTo(period_data[0]) <= 0 && period[1].compareTo(period_data[0]) > 0 ||
+                    period[0].compareTo(period_data[1]) < 0 && period[1].compareTo(period_data[1]) >= 0){
+                    String msg = "Period Without Overlaps condition violated by row (DateTime in seconds): ";
+                    for(Object val : data){
+                        if(val instanceof TimestampData){
+                            msg += ((TimestampData) val).getSeconds();
+                        }else{
+                            msg += val.toString();
+                        }
+                        msg += " | ";
+                    }
+                    throw Error.error(ErrorCode.X_23505, msg);
+                }
+            }
+            periods.add(period_data);
+        }
+
     }
 
     static String[] getConstraintInfo(Constraint c) {

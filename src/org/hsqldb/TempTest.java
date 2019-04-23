@@ -1,11 +1,15 @@
 package org.hsqldb;
 
+import org.hsqldb.types.TimestampData;
+
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.HashMap;
 
 
 public class TempTest {
@@ -152,7 +156,7 @@ public class TempTest {
         stmt.close();
     }
 
-    public synchronized void testPK() throws SQLException{
+    public synchronized void testPKUpdate() throws SQLException{
         Statement stmt =  conn.createStatement();
 
         String init = "DROP TABLE Emp";
@@ -179,6 +183,38 @@ public class TempTest {
         stmt.executeUpdate(addRow);
         //stmt.executeUpdate(addViolation);
         stmt.executeUpdate(updateRow);
+
+        stmt.close();
+    }
+
+    public synchronized void testPKInsert() throws SQLException{
+        Statement stmt =  conn.createStatement();
+
+        String init = "DROP TABLE Emp";
+        String createAppTable = "CREATE TABLE Emp (Dummy VARCHAR(30) NULL, ENo INTEGER, EName VARCHAR(30), EStart DATE, EEnd DATE, PERIOD FOR EPeriod (EStart, EEnd), PRIMARY KEY(ENo, EPeriod WITHOUT OVERLAPS))";
+
+        //String createTrigger = "CREATE TRIGGER testTrigInsert AFTER INSERT ON Emp FOR EACH ROW BEGIN ATOMIC INSERT INTO Emp VALUES ('trigger', 999, 'Trig',  '2011-01-01', '2011-02-01'); END";
+
+        //T1~T4 should be properly updated, and F1~F4 should not be
+        String addRow = "INSERT INTO Emp (Dummy, ENo, EName, EStart, EEnd) VALUES ('asdf', 1, 'T1',  '2019-02-01', '2019-02-28')," +
+                "('none', 2, 'T2', '2019-03-01', '2019-04-10')," +
+                "('asdf', 3, 'T3', '2019-02-01', '2019-02-15')," +
+                "('none', 4, 'T4', '2019-02-28', '2019-04-10')," +
+                "('none', 5, 'F1', '2019-03-01', '2019-03-20')," +
+                "('none', 6, 'F2', '2019-03-10', '2019-03-31')," +
+                "('none', 7, 'F3', '2019-03-10', '2019-03-20')," +
+
+                "('viol', 1, 'T111', '2019-02-22', '2019-03-02')," +
+
+                "('none', 8, 'F4', '2019-05-01', '2019-05-31')";
+
+        String addViolation = "INSERT INTO Emp (Dummy, ENo, EName, EStart, EEnd) VALUES ('none', 1, 'T11',  '2019-02-01', '2019-03-28')";
+
+        stmt.executeUpdate(init);
+        stmt.executeUpdate(createAppTable);
+        //stmt.executeUpdate(createTrigger);
+        stmt.executeUpdate(addRow);
+        //stmt.executeUpdate(addViolation);
 
         stmt.close();
     }
@@ -270,11 +306,10 @@ public class TempTest {
         stmt.close();
     }
 
-
     public static void main(String[] args) {
         TempTest test = new TempTest();
         try {
-            test.testPK();
+            test.testPKUpdate();
             //test.testUpdateForPeriodOf();
             System.out.println("------------------------");
             test.selectAll();
