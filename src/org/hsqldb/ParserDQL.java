@@ -867,8 +867,9 @@ public class ParserDQL extends ParserBase {
                 checkIsSimpleName();
             }
 
-            if(appPeriodName != null && token.tokenString.equals(appPeriodName)
-                    || token.tokenType == Tokens.PERIOD){
+            readIfThis(Tokens.PERIOD);
+
+            if(appPeriodName != null && token.tokenString.equals(appPeriodName)){
                 OrderedHashSet periodCols = table.getApplicationPeriod().columnNames;
                 String start = periodCols.get(0).toString();
                 String end   = periodCols.get(1).toString();

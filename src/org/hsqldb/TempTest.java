@@ -226,21 +226,28 @@ public class TempTest {
         String init2 = "DROP TABLE Dept";
         String init3 = "DROP TABLE Emp";
 
-        String createParent = "CREATE TABLE Dept (DNo INTEGER, DName VARCHAR(30), DStart DATE, DEnd DATE, PRIMARY KEY(DNo))";
-        String createChild = "CREATE TABLE Emp (ENo INTEGER, EName VARCHAR(30), EDept INTEGER, EStart DATE, EEnd DATE, PERIOD FOR EPeriod (EStart, EEnd), PRIMARY KEY(ENo, EPERIOD WITHOUT OVERLAPS), CONSTRAINT FK_test FOREIGN KEY (EDept, PERIOD) REFERENCES Dept (DNo))";
+        String createParent = "CREATE TABLE Dept (DNo INTEGER, DName VARCHAR(30), DStart DATE, DEnd DATE, Period FOR DPeriod (DStart, DEnd), PRIMARY KEY(DNo, DPERIOD))";
+        String createChild = "CREATE TABLE Emp (ENo INTEGER, EName VARCHAR(30), EDept INTEGER, EStart DATE, EEnd DATE, PERIOD FOR EPeriod (EStart, EEnd), PRIMARY KEY(ENo, EPERIOD), CONSTRAINT FK_test FOREIGN KEY (EDept, PERIOD EPeriod) REFERENCES Dept (DNo, PERIOD DPeriod))";
 
         String addParentRow = "INSERT INTO Dept (DNo, DName, DStart, DEnd) VALUES " +
                 "(3, 'Test', '2009-01-01', '2011-12-31')," +
+                "(3, 'Test', '2012-01-01', '2012-12-31')," +
+                "(3, 'Test', '2008-01-01', '2011-12-31')," +
+                "(3, 'Test', '2019-01-01', '2019-03-31')," +
                 "(4, 'QA',   '2011-06-01', '2011-12-31')";
 
         String addChildRow = "INSERT INTO Emp (ENo, EName, Edept, EStart, EEnd) VALUES " +
-                "(22218, 'Seo', 3, '2010-01-01', '2011-02-03')," +
-                "(22218, 'Seo', 4, '2011-02-03', '2011-11-12')";
+                "(22218, 'Seo', 3, '2009-01-01', '2011-12-31')," +
+                "(22218, 'Seo', 4, '2011-06-01', '2011-12-31')";
+        /*
+        "(22218, 'Seo', 3, '2010-01-01', '2011-02-03')," +
+        "(22218, 'Seo', 4, '2011-02-03', '2011-11-12')";
+        */
 
         String addViolation = "INSERT INTO Emp (Dummy, ENo, EName, EStart, EEnd) VALUES ('none', 1, 'T11',  '2019-03-01', '2019-03-31')";
         String updateRow = "UPDATE Emp SET ENo=2 WHERE Dummy='asdf'";
 
-        //stmt.executeUpdate(init);
+        stmt.executeUpdate(init);
         stmt.executeUpdate(init2);
         stmt.executeUpdate(init3);
         stmt.executeUpdate(createParent);
@@ -341,7 +348,7 @@ public class TempTest {
     public static void main(String[] args) {
         TempTest test = new TempTest();
         try {
-            test.testPKInsert();
+            test.testFK();
             //test.testUpdateForPeriodOf();
             System.out.println("------------------------");
             test.selectAll();

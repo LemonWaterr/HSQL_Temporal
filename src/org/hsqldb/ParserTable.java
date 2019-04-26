@@ -811,7 +811,8 @@ public class ParserTable extends ParserDML {
         }
 
         if (token.tokenType == Tokens.OPENBRACKET) {
-            mainColSet = readColumnNames(false);
+            SchemaObject mainTable = database.schemaManager.getSchemaObject(mainTableName);
+            mainColSet = readColumnNames((Table) mainTable);
         }
 
         int matchType = OpTypes.MATCH_SIMPLE;
@@ -1515,7 +1516,7 @@ public class ParserTable extends ParserDML {
                     }
                 }
 
-                OrderedHashSet set = readColumnNames(false);
+                OrderedHashSet set = readColumnNames((Table) schemaObject);
 
                 if (constName == null) {
                     constName = database.nameManager.newAutoName("CT",
@@ -1539,7 +1540,7 @@ public class ParserTable extends ParserDML {
                 read();
                 readThis(Tokens.KEY);
 
-                OrderedHashSet set = readColumnNames(false);
+                OrderedHashSet set = readColumnNames((Table) schemaObject);
                 Constraint c = readFKReferences((Table) schemaObject,
                                                 constName, set);
 
