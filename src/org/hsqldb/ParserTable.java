@@ -294,13 +294,14 @@ public class ParserTable extends ParserDML {
         setPeriodColumns(table, table.systemPeriod);
         setPeriodColumns(table, table.applicationPeriod);
 
-        if(table.isApplicationPeriodTable() && ((Constraint) tempConstraints.get(0)).getConstraintType() == SchemaObject.ConstraintTypes.PRIMARY_KEY){
-            if(((Constraint) tempConstraints.get(0)).mainColSet.contains(table.applicationPeriod.getName().name)){
-                ((Constraint) tempConstraints.get(0)).mainColSet.remove(table.applicationPeriod.getName().name);
-            }
+        /*
+        if(table.isApplicationPeriodTable() && ((Constraint) tempConstraints.get(0)).getConstraintType() == SchemaObject.ConstraintTypes.PRIMARY_KEY
+                                            && ((Constraint) tempConstraints.get(0)).mainColSet.contains(table.applicationPeriod.getName().name)){
+            ((Constraint) tempConstraints.get(0)).mainColSet.remove(table.applicationPeriod.getName().name);
             ((Constraint) tempConstraints.get(0)).mainColSet.add(table.applicationPeriod.getStartColumn().getNameString());
             ((Constraint) tempConstraints.get(0)).mainColSet.add(table.applicationPeriod.getEndColumn().getNameString());
         }
+        */
 
 
         return true;

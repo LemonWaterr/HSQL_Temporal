@@ -92,8 +92,6 @@ public class StatementDML extends StatementDMQL {
     /** ResultMetaData for generated values */
     ResultMetaData generatedResultMetaData;
 
-    CompileContext tempCompileContext;
-
     public StatementDML(int type, int group, HsqlName schemaName) {
         super(type, group, schemaName);
     }
@@ -154,8 +152,6 @@ public class StatementDML extends StatementDMQL {
         setDatabaseObjects(session, compileContext);
         checkAccessRights(session);
         targetRange.addAllColumns();
-
-        tempCompileContext = compileContext;
     }
 
     /**
@@ -581,7 +577,7 @@ public class StatementDML extends StatementDMQL {
                            updateExpressions, colTypes, newData);
 
             if(targetTable.withoutOverlaps){
-                performWithoutOverlapsCheck(newRowStore, session, targetTable, tempCompileContext, oldData, newData);
+                performWithoutOverlapsCheck(newRowStore, session, targetTable, oldData, newData);
             }
 
             rowset.addRow(session, row, newData, colTypes, updateColumnMap);
@@ -933,7 +929,7 @@ public class StatementDML extends StatementDMQL {
             Object[] data = newData.getCurrent();
 
             if(targetTable.withoutOverlaps){
-                performWithoutOverlapsCheck(newRowStore, session, targetTable, tempCompileContext, null, data);
+                performWithoutOverlapsCheck(newRowStore, session, targetTable, null, data);
             }
 
             // for identity using global sequence
@@ -991,7 +987,7 @@ public class StatementDML extends StatementDMQL {
         }
 
         if(targetTable.withoutOverlaps){
-            performWithoutOverlapsCheck(null, session, targetTable, tempCompileContext, null, data);
+            performWithoutOverlapsCheck(null, session, targetTable, null, data);
         }
 
         baseTable.insertSingleRow(session, store, data, null);
@@ -1815,7 +1811,7 @@ public class StatementDML extends StatementDMQL {
         }
     }
 
-    void performWithoutOverlapsCheck(HashMap<List<Object>, List<TimestampData[]>> rowStore, Session session, Table table, CompileContext compileContext, Object[] oldData, Object[] newData){
+    void performWithoutOverlapsCheck(HashMap<List<Object>, List<TimestampData[]>> rowStore, Session session, Table table, Object[] oldData, Object[] newData){
 
         if(rowStore != null){
             performWithoutOverlapsCheckOnNewRows(rowStore, table, newData);
@@ -1824,7 +1820,7 @@ public class StatementDML extends StatementDMQL {
         int[] pkIndices = table.getPrimaryKey();
         Type[] colTypes = table.getColumnTypes();
 
-        RangeVariable overlapRV = new RangeVariable(table, null, null, null, compileContext);
+        RangeVariable overlapRV = new RangeVariable(table, null, null, null, null);
         RangeVariable[] overlapRVs = new RangeVariable[]{ overlapRV };
         ExpressionLogical overlapCon = null;
         ExpressionLogical oldDataCon = null;
@@ -1865,7 +1861,7 @@ public class StatementDML extends StatementDMQL {
 
         //resolver
         RangeVariableResolver resolver = new RangeVariableResolver(session,
-                overlapRVs, null, compileContext, false);
+                overlapRVs, null, null, false);
         resolver.processConditions();
         overlapRVs = resolver.rangeVariables;
         RangeIterator overlapIt = RangeVariable.getIterator(session, overlapRVs);

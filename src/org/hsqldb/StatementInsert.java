@@ -92,8 +92,6 @@ public class StatementInsert extends StatementDML {
                          && insertExpression.nodes.length == 1
                          && updatableTableCheck == null
                          && specialAction == isNone;
-
-        tempCompileContext = compileContext;
     }
 
     /**
@@ -127,8 +125,6 @@ public class StatementInsert extends StatementDML {
         setupChecks();
         setDatabaseObjects(session, compileContext);
         checkAccessRights(session);
-
-        tempCompileContext = compileContext;
     }
 
     /**

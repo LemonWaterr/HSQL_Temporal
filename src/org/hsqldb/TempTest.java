@@ -204,17 +204,49 @@ public class TempTest {
                 "('none', 6, 'F2', '2019-03-10', '2019-03-31')," +
                 "('none', 7, 'F3', '2019-03-10', '2019-03-20')," +
 
-                "('viol', 1, 'T111', '2019-02-22', '2019-03-02')," +
+                //"('viol', 1, 'T111', '2019-02-22', '2019-03-02')," +
 
                 "('none', 8, 'F4', '2019-05-01', '2019-05-31')";
 
         String addViolation = "INSERT INTO Emp (Dummy, ENo, EName, EStart, EEnd) VALUES ('none', 1, 'T11',  '2019-02-01', '2019-03-28')";
 
-        stmt.executeUpdate(init);
+        //stmt.executeUpdate(init);
         stmt.executeUpdate(createAppTable);
         //stmt.executeUpdate(createTrigger);
         stmt.executeUpdate(addRow);
-        //stmt.executeUpdate(addViolation);
+        stmt.executeUpdate(addViolation);
+
+        stmt.close();
+    }
+
+    public synchronized void testFK() throws SQLException{
+        Statement stmt =  conn.createStatement();
+
+        String init =  "Alter TABLE Emp DROP CONSTRAINT FK_test";
+        String init2 = "DROP TABLE Dept";
+        String init3 = "DROP TABLE Emp";
+
+        String createParent = "CREATE TABLE Dept (DNo INTEGER, DName VARCHAR(30), DStart DATE, DEnd DATE, PRIMARY KEY(DNo))";
+        String createChild = "CREATE TABLE Emp (ENo INTEGER, EName VARCHAR(30), EDept INTEGER, EStart DATE, EEnd DATE, PERIOD FOR EPeriod (EStart, EEnd), PRIMARY KEY(ENo, EPERIOD WITHOUT OVERLAPS), CONSTRAINT FK_test FOREIGN KEY (EDept, PERIOD) REFERENCES Dept (DNo))";
+
+        String addParentRow = "INSERT INTO Dept (DNo, DName, DStart, DEnd) VALUES " +
+                "(3, 'Test', '2009-01-01', '2011-12-31')," +
+                "(4, 'QA',   '2011-06-01', '2011-12-31')";
+
+        String addChildRow = "INSERT INTO Emp (ENo, EName, Edept, EStart, EEnd) VALUES " +
+                "(22218, 'Seo', 3, '2010-01-01', '2011-02-03')," +
+                "(22218, 'Seo', 4, '2011-02-03', '2011-11-12')";
+
+        String addViolation = "INSERT INTO Emp (Dummy, ENo, EName, EStart, EEnd) VALUES ('none', 1, 'T11',  '2019-03-01', '2019-03-31')";
+        String updateRow = "UPDATE Emp SET ENo=2 WHERE Dummy='asdf'";
+
+        //stmt.executeUpdate(init);
+        stmt.executeUpdate(init2);
+        stmt.executeUpdate(init3);
+        stmt.executeUpdate(createParent);
+        stmt.executeUpdate(createChild);
+        stmt.executeUpdate(addParentRow);
+        stmt.executeUpdate(addChildRow);
 
         stmt.close();
     }
@@ -309,7 +341,7 @@ public class TempTest {
     public static void main(String[] args) {
         TempTest test = new TempTest();
         try {
-            test.testPKUpdate();
+            test.testPKInsert();
             //test.testUpdateForPeriodOf();
             System.out.println("------------------------");
             test.selectAll();

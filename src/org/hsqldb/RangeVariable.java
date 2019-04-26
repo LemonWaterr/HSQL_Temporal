@@ -179,7 +179,10 @@ public class RangeVariable {
         whereConditions = new RangeVariableConditions[]{
             new RangeVariableConditions(this, false) };
 
-        compileContext.registerRangeVariable(this);
+
+        if(compileContext != null){
+            compileContext.registerRangeVariable(this);
+        }
 
         if (rangeTable.getColumnCount() != 0) {
             setRangeTableVariables();

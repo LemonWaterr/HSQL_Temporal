@@ -867,24 +867,36 @@ public class ParserDQL extends ParserBase {
                 checkIsSimpleName();
             }
 
-            if (!set.add(token.tokenString)) {
-                throw Error.error(ErrorCode.X_42577, token.tokenString);
+            if(appPeriodName != null && token.tokenString.equals(appPeriodName)
+                    || token.tokenType == Tokens.PERIOD){
+                OrderedHashSet periodCols = table.getApplicationPeriod().columnNames;
+                String start = periodCols.get(0).toString();
+                String end   = periodCols.get(1).toString();
+                if(start == null || end == null){
+                    throw Error.error(ErrorCode.X_42501, "application period column(s) not found");
+                }
+                if (!set.add(start)) {
+                    throw Error.error(ErrorCode.X_42577, start);
+                }
+                if (!set.add(end)) {
+                    throw Error.error(ErrorCode.X_42577, end);
+                }
+
+                read();
+
+                if(readIfThis(Tokens.WITHOUT)){
+                    readThis(Tokens.OVERLAPS);
+                    table.withoutOverlaps = true;
+                }
+            }else{
+                if (!set.add(token.tokenString)) {
+                    throw Error.error(ErrorCode.X_42577, token.tokenString);
+                }
+                read();
             }
 
             if (quotedFlags != null) {
                 quotedFlags.setValue(i, isDelimitedIdentifier());
-            }
-
-            String currentToken = token.tokenString;
-            read();
-
-            if(appPeriodName != null){
-                if(currentToken.equals(appPeriodName)){
-                    if(readIfThis(Tokens.WITHOUT)){
-                        readThis(Tokens.OVERLAPS);
-                        table.withoutOverlaps = true;
-                    }
-                }
             }
 
             i++;
