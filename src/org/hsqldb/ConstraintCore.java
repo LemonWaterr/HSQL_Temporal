@@ -72,6 +72,9 @@ class ConstraintCore {
     boolean hasDeleteAction;
     int     matchType;
 
+    // To mark application period FK constraint
+    boolean hasAppPeriod;
+
     //
     ConstraintCore duplicate() {
 

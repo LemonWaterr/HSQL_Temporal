@@ -810,9 +810,10 @@ public class ParserTable extends ParserDML {
             mainTableName = readFKTableName(schema);
         }
 
+        Table mainTable = (Table) database.schemaManager.getSchemaObject(mainTableName);
+
         if (token.tokenType == Tokens.OPENBRACKET) {
-            SchemaObject mainTable = database.schemaManager.getSchemaObject(mainTableName);
-            mainColSet = readColumnNames((Table) mainTable);
+            mainColSet = readColumnNames(mainTable);
         }
 
         int matchType = OpTypes.MATCH_SIMPLE;
@@ -941,10 +942,17 @@ public class ParserTable extends ParserDML {
                     SchemaObject.CONSTRAINT);
         }
 
+        boolean hasAppPeriod = false;
+        if(refTable.isApplicationPeriodTable() && mainTable.isApplicationPeriodTable()){
+            if(refColSet.containsAll(refTable.getApplicationPeriod().columnNames) && mainColSet.containsAll(mainTable.getApplicationPeriod().columnNames)){
+                hasAppPeriod = true;
+            }
+        }
+
         return new Constraint(constraintName, refTable.getName(), refColSet,
                               mainTableName, mainColSet,
                               SchemaObject.ConstraintTypes.FOREIGN_KEY,
-                              deleteAction, updateAction, matchType);
+                              deleteAction, updateAction, matchType, hasAppPeriod);
     }
 
     HsqlName readFKTableName(HsqlName schema) {

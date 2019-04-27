@@ -1127,7 +1127,24 @@ public class IndexAVL implements Index {
 
         NodeAVL node = findNode(session, store, rowdata, rowColMap,
                                 rowColMap.length, OpTypes.EQUAL,
-                                TransactionManager.ACTION_REF, false);
+                                TransactionManager.ACTION_READ, false);
+
+        NodeAVL temp = findNode(session, store, rowdata, new int[] {2},
+                1, OpTypes.EQUAL,
+                TransactionManager.ACTION_REF, false);
+
+        RowIterator tempIt = new IndexRowIterator(session, store, this, temp, 0, false, false);
+
+        //RowIterator tempIt = findFirstRow(session, store, rowdata, new int[] {2});
+
+        System.out.println("----");
+        while(tempIt.next()){
+            Object[] objs = tempIt.getCurrent();
+            for(Object obj : objs){
+                System.out.println(obj.toString());
+            }
+        }
+        System.out.println("----");
 
         return node != null;
     }

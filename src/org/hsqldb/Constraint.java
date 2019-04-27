@@ -131,7 +131,7 @@ public final class Constraint implements SchemaObject {
     public Constraint(HsqlName name, HsqlName refTableName,
                       OrderedHashSet refCols, HsqlName mainTableName,
                       OrderedHashSet mainCols, int type, int deleteAction,
-                      int updateAction, int matchType) {
+                      int updateAction, int matchType, boolean hasAppPeriod) {
 
         this.name          = name;
         constType          = type;
@@ -143,6 +143,7 @@ public final class Constraint implements SchemaObject {
         core.deleteAction  = deleteAction;
         core.updateAction  = updateAction;
         core.matchType     = matchType;
+        core.hasAppPeriod  = hasAppPeriod;
 
         switch (core.deleteAction) {
 
