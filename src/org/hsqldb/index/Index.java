@@ -165,7 +165,7 @@ public interface Index extends SchemaObject {
     void delete(Session session, PersistentStore store, Row row);
 
     boolean existsParent(Session session, PersistentStore store,
-                         Object[] rowdata, int[] rowColMap);
+                         Object[] rowdata, int[] rowColMap, int[] refPeriodCols, int[] mainPeriodCols);
 
     /**
      * Return the first node equal to the indexdata object. The rowdata has

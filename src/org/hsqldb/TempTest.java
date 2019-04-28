@@ -235,22 +235,25 @@ public class TempTest {
         String createChild = "CREATE TABLE Emp (ENo INTEGER, EName VARCHAR(30), EDept INTEGER, EStart DATE, EEnd DATE, PERIOD FOR EPeriod (EStart, EEnd), CONSTRAINT FK_test FOREIGN KEY (EDept, PERIOD EPeriod) REFERENCES Dept (DNo, PERIOD DPeriod) ON DELETE CASCADE)";
 
         String addParentRow = "INSERT INTO Dept (DNo, DName, DStart, DEnd) VALUES " +
-                "(3, 'Test2', '2009-01-01', '2011-12-31')," +
-                "(3, 'Test3', '2012-01-01', '2012-12-31')," +
-                "(3, 'Test1', '2008-01-01', '2011-12-31')," +
-                "(3, 'Test4', '2019-01-01', '2019-03-31')," +
+                "(3, 'Test1', '2007-01-01', '2007-12-31')," +
+                "(3, 'Test2', '2009-01-01', '2009-12-31')," +
+                "(3, 'Test3', '2011-01-01', '2011-12-31')," +
+                "(3, 'Test4', '2012-01-01', '2012-12-30')," +
                 "(4, 'QA',   '2011-06-01', '2011-12-31')";
 
-        String addChildRow = "INSERT INTO Emp (ENo, EName, Edept, EStart, EEnd) VALUES " +
-                "(22218, 'Seo', 3, '2009-01-01', '2011-12-31')," +
-                "(33333, 'Woo', 3, '2009-01-01', '2011-12-31')," +
-                "(22218, 'Seo', 4, '2011-06-01', '2011-12-31')";
+        String addChildRow = "INSERT INTO Emp (ENo, EName, EDept, EStart, EEnd) VALUES " +
+                "(22218,  'T1', 3, '2009-01-01', '2009-12-31')," +
+                "(21119,  'T2', 3, '2009-01-01', '2009-05-31')," +
+                "(21119,  'T3', 3, '2009-05-01', '2009-12-31')," +
+                //"(21120,  'F1', 3, '2008-12-31', '2009-05-31')," +
+                //"(21121,  'F2', 3, '2009-01-01', '2010-01-01')," +
+                "(30000, 'Seo', 4, '2011-07-01', '2011-12-31')";
         /*
         "(22218, 'Seo', 3, '2010-01-01', '2011-02-03')," +
         "(22218, 'Seo', 4, '2011-02-03', '2011-11-12')";
         */
 
-        String addViolation = "INSERT INTO Emp (Dummy, ENo, EName, EStart, EEnd) VALUES ('none', 1, 'T11',  '2019-03-01', '2019-03-31')";
+        String addViolation = "INSERT INTO Emp (ENo, EName, EDept, EStart, EEnd) VALUES (21120, 'F1', '2019-03-01', '2019-03-31')";
         String updateRow = "UPDATE Emp SET ENo=2 WHERE Dummy='asdf'";
         String deleteRow = "DELETE FROM Dept WHERE DName = 'Test2'";
 

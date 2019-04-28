@@ -785,9 +785,17 @@ public final class Constraint implements SchemaObject {
                     }
 
                     // core.matchType == OpTypes.MATCH_FULL
-                } else if (core.mainIndex.existsParent(session, store, data,
-                                                       core.refCols)) {
-                    return;
+                } else {
+                    int[] refPeriodCols  = null;
+                    int[] mainPeriodCols = null;
+                    if(core.hasAppPeriod){
+                        refPeriodCols  = new int[] {core.refTable.applicationPeriodStartColumn,  core.refTable.applicationPeriodEndColumn};
+                        mainPeriodCols = new int[] {core.mainTable.applicationPeriodStartColumn, core.mainTable.applicationPeriodEndColumn};
+                    }
+                    if(core.mainIndex.existsParent(session, store, data,
+                            core.refCols, refPeriodCols, mainPeriodCols)){
+                        return;
+                    }
                 }
 
                 throw getException(data);

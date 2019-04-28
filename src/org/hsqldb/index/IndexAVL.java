@@ -1123,30 +1123,44 @@ public class IndexAVL implements Index {
     }
 
     public boolean existsParent(Session session, PersistentStore store,
-                                Object[] rowdata, int[] rowColMap) {
+                                Object[] rowdata, int[] rowColMap, int[] refPeriodCols, int[] mainPeriodCols) {
 
-        NodeAVL node = findNode(session, store, rowdata, rowColMap,
-                                rowColMap.length, OpTypes.EQUAL,
-                                TransactionManager.ACTION_READ, false);
+        if(refPeriodCols == null){
 
-        NodeAVL temp = findNode(session, store, rowdata, new int[] {2},
-                1, OpTypes.EQUAL,
-                TransactionManager.ACTION_REF, false);
+            NodeAVL node = findNode(session, store, rowdata, rowColMap,
+                    rowColMap.length, OpTypes.EQUAL,
+                    TransactionManager.ACTION_READ, false);
 
-        RowIterator tempIt = new IndexRowIterator(session, store, this, temp, 0, false, false);
+            return node != null;
 
-        //RowIterator tempIt = findFirstRow(session, store, rowdata, new int[] {2});
+        }else{
 
-        System.out.println("----");
-        while(tempIt.next()){
-            Object[] objs = tempIt.getCurrent();
-            for(Object obj : objs){
-                System.out.println(obj.toString());
+            int[] newColMap = new int[rowColMap.length - 2];
+            int i = 0;
+            for(int j : rowColMap){
+                if(j != refPeriodCols[0] && j != refPeriodCols[1]){
+                    newColMap[i] = j;
+                    i++;
+                }
             }
-        }
-        System.out.println("----");
 
-        return node != null;
+            RowIterator parentRows = findFirstRow(session, store, rowdata, newColMap);
+
+            while(parentRows.next()){
+                Object[] parentData = parentRows.getCurrent(); //this is MainTable data
+                if (compareRowNonUnique(session, parentData, rowdata, newColMap) != 0) { //TODO: this is okay only when 'PERIOD SOMEPERIOD' is defined last in the columns for FK
+                    break;
+                }
+
+                if(((TimestampData)parentData[mainPeriodCols[0]]).compareTo((TimestampData)rowdata[refPeriodCols[0]]) <= 0
+                    && ((TimestampData)parentData[mainPeriodCols[1]]).compareTo((TimestampData)rowdata[refPeriodCols[1]]) >= 0){
+
+                    return true;
+                }
+            }
+
+            return false;
+        }
     }
 
     /**
