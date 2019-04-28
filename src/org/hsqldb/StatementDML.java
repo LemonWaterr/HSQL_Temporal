@@ -1666,17 +1666,43 @@ public class StatementDML extends StatementDMQL {
                 }
             }
 
-            RowIterator refiterator = c.findFkRef(session, row.getData());
+            //If FK has application period, period should not be included for getting the refiterator
+            int[] newColMap = null;
+            if(c.core.hasAppPeriod){
+                newColMap = new int[c.core.mainCols.length - 2];
+                int[] mainPeriodCols = new int[] {table.applicationPeriodStartColumn, table.applicationPeriodEndColumn};
+                int k = 0;
+                for(int j : c.core.mainCols){
+                    if(j != mainPeriodCols[0] && j != mainPeriodCols[1]){
+                        newColMap[k] = j;
+                        k++;
+                    }
+                }
+            }
+
+            RowIterator refiterator = c.findFkRef(session, row.getData(), newColMap);
 
             while (refiterator.next()) {
                 Row      refRow  = refiterator.getCurrentRow();
                 Object[] refData = null;
 
-                /** @todo use MATCH */
-                if (c.core.refIndex.compareRowNonUnique(
-                        session, refRow.getData(), row.getData(),
-                        c.core.mainCols) != 0) {
-                    break;
+                if(!c.core.hasAppPeriod){
+                    /** @todo use MATCH */
+                    if (c.core.refIndex.compareRowNonUnique(
+                            session, refRow.getData(), row.getData(),
+                            c.core.mainCols) != 0) {
+                        break;
+                    }
+                }else{
+                    if (c.core.refIndex.compareRowNonUnique(
+                            session, refRow.getData(), row.getData(),
+                            newColMap) != 0) {
+                        break;
+                    //if parent(this) period does not contain the child(ref) period
+                    }else if(!(((TimestampData)row.getData()[table.applicationPeriodStartColumn]).compareTo((TimestampData)refRow.getData()[c.core.refTable.applicationPeriodStartColumn]) <= 0
+                            && ((TimestampData)row.getData()[table.applicationPeriodEndColumn]).compareTo((TimestampData)refRow.getData()[c.core.refTable.applicationPeriodEndColumn]) >= 0)){
+                        break;
+                    }
                 }
 
                 if (delete && refRow.getId() == row.getId()) {

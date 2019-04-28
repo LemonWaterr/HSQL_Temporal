@@ -919,7 +919,7 @@ public final class Constraint implements SchemaObject {
      * @param row array of objects for a database row
      * @return iterator
      */
-    RowIterator findFkRef(Session session, Object[] row) {
+    RowIterator findFkRef(Session session, Object[] row, int[] rowColMap) {
 
         if (row == null || ArrayUtil.hasNull(row, core.mainCols)) {
             return core.refIndex.emptyIterator();
@@ -927,7 +927,13 @@ public final class Constraint implements SchemaObject {
 
         PersistentStore store = core.refTable.getRowStore(session);
 
-        return core.refIndex.findFirstRow(session, store, row, core.mainCols);
+        if(rowColMap == null){
+            return core.refIndex.findFirstRow(session, store, row, core.mainCols);
+        }else{
+            return core.refIndex.findFirstRow(session, store, row, rowColMap);
+        }
+
+
     }
 
     /**

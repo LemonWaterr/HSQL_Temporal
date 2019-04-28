@@ -55,7 +55,12 @@ public class TempTest {
                 o = rs.getObject(i + 1);    // Is SQL the first column is indexed
 
                 // with 1 not 0
-                System.out.print(o.toString() + " ");
+                if(o == null){
+                    System.out.print("NULL ");
+                }else{
+                    System.out.print(o.toString() + " ");
+                }
+
             }
 
             System.out.println(" ");
@@ -232,7 +237,7 @@ public class TempTest {
         String init3 = "DROP TABLE Emp";
 
         String createParent = "CREATE TABLE Dept (DNo INTEGER, DName VARCHAR(30), DStart DATE, DEnd DATE, Period FOR DPeriod (DStart, DEnd), PRIMARY KEY(DNo, DPERIOD))";
-        String createChild = "CREATE TABLE Emp (ENo INTEGER, EName VARCHAR(30), EDept INTEGER, EStart DATE, EEnd DATE, PERIOD FOR EPeriod (EStart, EEnd), CONSTRAINT FK_test FOREIGN KEY (EDept, PERIOD EPeriod) REFERENCES Dept (DNo, PERIOD DPeriod) ON DELETE CASCADE)";
+        String createChild = "CREATE TABLE Emp (ENo INTEGER, EName VARCHAR(30), EDept INTEGER, EStart DATE, EEnd DATE, PERIOD FOR EPeriod (EStart, EEnd), CONSTRAINT FK_test FOREIGN KEY (EDept, PERIOD EPeriod) REFERENCES Dept (DNo, PERIOD DPeriod) ON DELETE CASCADE ON UPDATE SET NULL)";
 
         String addParentRow = "INSERT INTO Dept (DNo, DName, DStart, DEnd) VALUES " +
                 "(3, 'Test1', '2007-01-01', '2007-12-31')," +
@@ -254,7 +259,7 @@ public class TempTest {
         */
 
         String addViolation = "INSERT INTO Emp (ENo, EName, EDept, EStart, EEnd) VALUES (21120, 'F1', '2019-03-01', '2019-03-31')";
-        String updateRow = "UPDATE Emp SET ENo=2 WHERE Dummy='asdf'";
+        String updateRow = "UPDATE Dept SET DNo=5 WHERE DNo=3";
         String deleteRow = "DELETE FROM Dept WHERE DName = 'Test2'";
 
         stmt.executeUpdate(init);
@@ -264,7 +269,7 @@ public class TempTest {
         stmt.executeUpdate(createChild);
         stmt.executeUpdate(addParentRow);
         stmt.executeUpdate(addChildRow);
-        //stmt.executeUpdate(deleteRow);
+        stmt.executeUpdate(updateRow);
 
         stmt.close();
     }
@@ -301,14 +306,15 @@ public class TempTest {
         String addRow = "INSERT INTO Emp (Dummy, ENo, EName) VALUES (123, 2, 'Seo')";
         String addRow2 = "INSERT INTO Emp (Dummy, ENo, EName) VALUES (456, 2, 'Charlie')";
         String addRow3 = "INSERT INTO Emp (Dummy, ENo, EName) VALUES (456, 3, 'Violet'),(457, 3, 'Violet2'),(458, 3, 'Violet3')";
-        String updateRow = "UPDATE Emp SET EName = 'Woo', Dummy = 999 WHERE ENo < 3 AND EName = 'Seo'";
+        //String updateRow = "UPDATE Emp SET EName = 'Woo', Dummy = 999 WHERE ENo < 3 AND EName = 'Seo'";
+        String deleteRow = "DELETE FROM Emp WHERE ENo = 2";
 
         stmt.executeUpdate(init);
         stmt.executeUpdate(createTable);
         stmt.executeUpdate(addRow);
         stmt.executeUpdate(addRow2);
         stmt.executeUpdate(addRow3);
-        stmt.executeUpdate(updateRow);
+        stmt.executeUpdate(deleteRow);
 
         stmt.close();
     }
