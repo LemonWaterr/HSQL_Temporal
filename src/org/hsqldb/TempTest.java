@@ -176,6 +176,10 @@ public class TempTest {
 
         //T1~T4 should be properly updated, and F1~F4 should not be
         String addRow = "INSERT INTO Emp (Dummy, ENo, EName, EStart, EEnd) VALUES ('asdf', 1, 'T1',  '2019-02-01', '2019-02-28')," +
+                "('a', 1, 'T1',  '2015-02-01', '2016-02-01')," +
+                "('c', 1, 'T1',  '2017-02-01', '2018-02-01')," +
+                "('b', 1, 'T1',  '2016-02-01', '2017-02-01')," +
+
                 "('none', 2, 'T2', '2019-03-01', '2019-04-10')," +
                 "('asdf', 3, 'T3', '2019-02-01', '2019-02-15')," +
                 "('none', 4, 'T4', '2019-02-28', '2019-04-10')," +
@@ -185,13 +189,13 @@ public class TempTest {
                 "('none', 8, 'F4', '2019-05-01', '2019-05-31')";
 
         String addViolation = "INSERT INTO Emp (Dummy, ENo, EName, EStart, EEnd) VALUES ('none', 1, 'T11',  '2019-02-01', '2019-03-31')";
-        String updateRow = "UPDATE Emp SET ENo=2 WHERE Dummy='asdf'";
+        String updateRow = "UPDATE Emp SET Dummy='d' WHERE Dummy='c'";
 
         stmt.executeUpdate(init);
         stmt.executeUpdate(createAppTable);
         //stmt.executeUpdate(createTrigger);
         stmt.executeUpdate(addRow);
-        //stmt.executeUpdate(addViolation);
+        stmt.executeUpdate(addViolation);
         //stmt.executeUpdate(updateRow);
 
         stmt.close();

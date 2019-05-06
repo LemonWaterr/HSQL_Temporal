@@ -53,6 +53,7 @@ import org.hsqldb.types.TimestampData;
 import org.hsqldb.types.Type;
 import org.hsqldb.types.Types;
 
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -1139,7 +1140,7 @@ public class StatementDML extends StatementDMQL {
                 Object[]        data         = navigator.getCurrentChangedData();
                 Table           currentTable = ((Table) row.getTable());
 
-                performWithoutOverlapsCheck(newRowStore, session, currentTable, row.getData(), data);
+                performWithoutOverlapsCheck(newRowStore, session, currentTable, row, data);
             }
             navigator.beforeFirst();
         }
@@ -1841,88 +1842,65 @@ public class StatementDML extends StatementDMQL {
         }
     }
 
-    void performWithoutOverlapsCheck(HashMap<List<Object>, List<TimestampData[]>> rowStore, Session session, Table table, Object[] oldData, Object[] newData){
+    void performWithoutOverlapsCheck(HashMap<List<Object>, List<TimestampData[]>> rowStore, Session session, Table table, Row oldRow, Object[] newData){
 
         if(rowStore != null){
             performWithoutOverlapsCheckOnNewRows(rowStore, table, newData);
         }
 
-        int[] pkIndices = table.getPrimaryKey();
-        Type[] colTypes = table.getColumnTypes();
+        int[] pkIndicesTemp = table.getPrimaryKey();
+        int[] pkIndices = new int[pkIndicesTemp.length - 2];
+        int count = 0;
+        for(int index : pkIndicesTemp){
+            if(index != table.applicationPeriodStartColumn && index != table.applicationPeriodEndColumn){
+                pkIndices[count] = index;
+                count++;
+            }
+        }
 
-        RangeVariable overlapRV = new RangeVariable(table, null, null, null, null);
-        RangeVariable[] overlapRVs = new RangeVariable[]{ overlapRV };
-        ExpressionLogical overlapCon = null;
-        ExpressionLogical oldDataCon = null;
+        TimestampData newStart = (TimestampData) newData[table.applicationPeriodStartColumn];
+        TimestampData newEnd   = (TimestampData) newData[table.applicationPeriodEndColumn];
+        RowIterator it = table.getPrimaryIndex().findFirstRow(session, table.getRowStore(session), newData, pkIndices);
 
-        //add PKs to condition
-        for(int i : pkIndices){
-            if(oldData != null){
-                oldDataCon = addConditionForWithoutOverlaps(i, oldDataCon, table, overlapRV, oldData[i], colTypes[i]);
+        while(it.next()){
+            Row row = it.getCurrentRow();
+            Object[] data = row.getData();
+
+            if (table.getPrimaryIndex().compareRowNonUnique(
+                    session, data, newData,
+                    pkIndices) != 0) {
+                break;
             }
 
-            if(i == table.applicationPeriodStartColumn || i == table.applicationPeriodEndColumn){
+            if (oldRow != null && oldRow.getId() == row.getId()) {
                 continue;
-            }else{
-                overlapCon = addConditionForWithoutOverlaps(i, overlapCon, table, overlapRV, newData[i], colTypes[i]);
             }
-        }
 
-        //Negate oldDataCon and AND it to overlapCon
-        if(oldDataCon != null && overlapCon != null){
-            oldDataCon = new ExpressionLogical(OpTypes.NOT, oldDataCon);
-            overlapCon = new ExpressionLogical(OpTypes.AND, oldDataCon, overlapCon);
-        }
-        overlapRV.joinCondition = overlapCon;
+            TimestampData start = (TimestampData) data[table.applicationPeriodStartColumn];
+            TimestampData end = (TimestampData) data[table.applicationPeriodEndColumn];
 
-        //add overlap to condition
-        ExpressionColumn startCol = new ExpressionColumn(null, null, table.getApplicationPeriod().getStartColumn().getNameString());
-        ExpressionColumn endCol   = new ExpressionColumn(null, null, table.getApplicationPeriod().getEndColumn().getNameString());
-        int[] periodIndices = {table.applicationPeriodStartColumn, table.applicationPeriodEndColumn};
-        startCol.setAttributesAsColumn(overlapRV, periodIndices[0]);
-        endCol.setAttributesAsColumn(overlapRV, periodIndices[1]);
-        Expression startVal =  new ExpressionValue(newData[periodIndices[0]], colTypes[periodIndices[0]]);
-        Expression endVal =  new ExpressionValue(newData[periodIndices[1]], colTypes[periodIndices[1]]);
-        ExpressionPeriod left = new ExpressionPeriod(table.getApplicationPeriod());
-        ExpressionPeriod right = new ExpressionPeriod(startVal, endVal);
-        ExpressionPeriodOp periodCondition = new ExpressionPeriodOp(OpTypes.RANGE_OVERLAPS, left, right);
-        periodCondition.setRangeVariable(session, overlapRV, "application");
-        overlapRV.setApplicationPeriodCondition(periodCondition);
+            System.out.println("----------");
+            System.out.println(data[0]);
+            System.out.println(((TimestampData)newStart).getSeconds() + " " + ((TimestampData)newEnd).getSeconds());
+            System.out.println(((TimestampData)start).getSeconds() + " " + ((TimestampData)end).getSeconds());
 
-        //resolver
-        RangeVariableResolver resolver = new RangeVariableResolver(session,
-                overlapRVs, null, null, false);
-        resolver.processConditions();
-        overlapRVs = resolver.rangeVariables;
-        RangeIterator overlapIt = RangeVariable.getIterator(session, overlapRVs);
+            System.out.println(start.compareTo(newEnd) < 0);
+            System.out.println(end.compareTo(newStart) > 0);
 
-
-        if(overlapIt.next()){
-            String msg = "Period Without Overlaps condition violated by row (DateTime in seconds): ";
-            for(Object val : newData){
-                if(val instanceof TimestampData){
-                    msg += ((TimestampData) val).getSeconds();
-                }else{
-                    msg += val.toString();
+            //if overlaps
+            if(start.compareTo(newEnd) < 0 && end.compareTo(newStart) > 0){
+                String msg = "Period Without Overlaps condition violated trying to insert/update into (DateTime in seconds): ";
+                for(Object val : data){
+                    if(val instanceof TimestampData){
+                        msg += ((TimestampData) val).getSeconds();
+                    }else{
+                        msg += val.toString();
+                    }
+                    msg += " | ";
                 }
-                msg += " | ";
+                throw Error.error(ErrorCode.X_23505, msg);
             }
-            throw Error.error(ErrorCode.X_23505, msg);
-        }
 
-    }
-
-    ExpressionLogical addConditionForWithoutOverlaps(int i, ExpressionLogical overlapCon, Table table, RangeVariable overlapRV, Object val, Type type){
-
-        ExpressionColumn overlapCol = new ExpressionColumn(null, null, table.getColumn(i).getNameString());
-        overlapCol.setAttributesAsColumn(overlapRV, i);
-        Expression overlapVal =  new ExpressionValue(val, type);
-        ExpressionLogical result = new ExpressionLogical(OpTypes.EQUAL, overlapCol, overlapVal);
-
-        if(overlapCon == null){
-            return result;
-        }else{
-            return new ExpressionLogical(OpTypes.AND, overlapCon, result);
         }
     }
 
@@ -1945,9 +1923,8 @@ public class StatementDML extends StatementDMQL {
         }else{
             List<TimestampData[]> periods = rowStore.get(key);
             for(TimestampData[] period : periods){
-                if(period[0].compareTo(period_data[0]) <= 0 && period[1].compareTo(period_data[0]) > 0 ||
-                    period[0].compareTo(period_data[1]) < 0 && period[1].compareTo(period_data[1]) >= 0){
-                    String msg = "Period Without Overlaps condition violated by row (DateTime in seconds): ";
+                if(period[0].compareTo(period_data[1]) < 0 && period[1].compareTo(period_data[0]) > 0){
+                    String msg = "Period Without Overlaps condition violated trying to insert/update into (DateTime in seconds): ";
                     for(Object val : data){
                         if(val instanceof TimestampData){
                             msg += ((TimestampData) val).getSeconds();
