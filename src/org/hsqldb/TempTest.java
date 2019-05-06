@@ -95,8 +95,8 @@ public class TempTest {
 
         System.out.println("---------------------------");
 
-        ResultSet rs2 = stmt.executeQuery("SELECT * FROM Dept");
-        dump(rs2);
+        //ResultSet rs2 = stmt.executeQuery("SELECT * FROM Dept");
+        //dump(rs2);
 
         stmt.close();
     }
@@ -184,7 +184,7 @@ public class TempTest {
                 "('none', 7, 'F3', '2019-03-10', '2019-03-20')," +
                 "('none', 8, 'F4', '2019-05-01', '2019-05-31')";
 
-        String addViolation = "INSERT INTO Emp (Dummy, ENo, EName, EStart, EEnd) VALUES ('none', 1, 'T11',  '2019-03-01', '2019-03-31')";
+        String addViolation = "INSERT INTO Emp (Dummy, ENo, EName, EStart, EEnd) VALUES ('none', 1, 'T11',  '2019-02-01', '2019-03-31')";
         String updateRow = "UPDATE Emp SET ENo=2 WHERE Dummy='asdf'";
 
         stmt.executeUpdate(init);
@@ -192,7 +192,7 @@ public class TempTest {
         //stmt.executeUpdate(createTrigger);
         stmt.executeUpdate(addRow);
         //stmt.executeUpdate(addViolation);
-        stmt.executeUpdate(updateRow);
+        //stmt.executeUpdate(updateRow);
 
         stmt.close();
     }
@@ -218,9 +218,9 @@ public class TempTest {
 
                 "('none', 8, 'F4', '2019-05-01', '2019-05-31')";
 
-        String addViolation = "INSERT INTO Emp (Dummy, ENo, EName, EStart, EEnd) VALUES ('none', 1, 'T11',  '2019-02-01', '2019-03-28')";
+        String addViolation = "INSERT INTO Emp (Dummy, ENo, EName, EStart, EEnd) VALUES ('none', 1, 'T11',  '2019-03-01', '2019-03-28')";
 
-        //stmt.executeUpdate(init);
+        stmt.executeUpdate(init);
         stmt.executeUpdate(createAppTable);
         //stmt.executeUpdate(createTrigger);
         stmt.executeUpdate(addRow);
@@ -269,7 +269,7 @@ public class TempTest {
         stmt.executeUpdate(createChild);
         stmt.executeUpdate(addParentRow);
         stmt.executeUpdate(addChildRow);
-        stmt.executeUpdate(updateRow);
+        stmt.executeUpdate(deleteRow);
 
         stmt.close();
     }
@@ -365,7 +365,7 @@ public class TempTest {
     public static void main(String[] args) {
         TempTest test = new TempTest();
         try {
-            test.testFK();
+            test. testPKUpdate();
             //test.testUpdateForPeriodOf();
             System.out.println("------------------------");
             test.selectAll();

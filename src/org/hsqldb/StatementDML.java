@@ -547,38 +547,16 @@ public class StatementDML extends StatementDMQL {
 
         session.sessionContext.rownum = 1;
 
-        //application period - FOR PORTION OF
-        boolean for_portion_of = false;
-        TimestampData[] portion_values = new TimestampData[2];
-        if (targetRangeVariables[0].applicationPeriodCondition != null) {
-            for_portion_of = true;
-            portion_values[0] = (TimestampData) targetRangeVariables[0].applicationPeriodCondition.nodes[0].nodes[0].valueData;
-            portion_values[1] = (TimestampData) targetRangeVariables[0].applicationPeriodCondition.nodes[0].nodes[1].valueData;
-        }
-
         int rowCount = 0;
-        HashMap<List<Object>, List<TimestampData[]>> newRowStore = new HashMap<>();
 
         while (it.next()) {
             session.sessionData.startRowProcessing();
 
             Row      row     = it.getCurrentRow();
             Object[] newData = row.getDataCopy();
-            Object[] oldData = row.getDataCopy();
-
-            //make inserts & change newData IF portion_values are not strictly equal to the row's period values
-            if (for_portion_of) {
-                Table currentTable    = (Table) row.getTable();
-                PersistentStore store = currentTable.getRowStore(session);
-                newData               = currentTable.handleForPortionOf(session, store, newData, portion_values);
-            }
 
             getUpdatedData(session, targets, baseTable, updateColumnMap,
                            updateExpressions, colTypes, newData);
-
-            if(targetTable.withoutOverlaps){
-                performWithoutOverlapsCheck(newRowStore, session, targetTable, oldData, newData);
-            }
 
             rowset.addRow(session, row, newData, colTypes, updateColumnMap);
 
@@ -604,7 +582,15 @@ public class StatementDML extends StatementDMQL {
 //* debug 190 */
         rowset.beforeFirst();
 
-        count = update(session, baseTable, rowset, generatedNavigator);
+        //application period - FOR PORTION OF
+        TimestampData[] portion = null;
+        if (targetRangeVariables[0].applicationPeriodCondition != null) {
+            portion = new TimestampData[2];
+            portion[0] = (TimestampData) targetRangeVariables[0].applicationPeriodCondition.nodes[0].nodes[0].valueData;
+            portion[1] = (TimestampData) targetRangeVariables[0].applicationPeriodCondition.nodes[0].nodes[1].valueData;
+        }
+
+        count = update(session, baseTable, rowset, generatedNavigator, portion);
 
         if (resultOut == null) {
             if (count == 1) {
@@ -849,7 +835,7 @@ public class StatementDML extends StatementDMQL {
         // update any matched rows
         if (hasWhenMatched) {
             count = update(session, baseTable, updateRowSet,
-                           generatedNavigator);
+                           generatedNavigator, null);
         }
 
         // insert any non-matched rows
@@ -911,6 +897,16 @@ public class StatementDML extends StatementDMQL {
             newData.beforeFirst();
         }
 
+        if(baseTable.withoutOverlaps){
+            HashMap<List<Object>, List<TimestampData[]>> newRowStore = new HashMap<>();
+            while (newData.next()) {
+                Object[] data = newData.getCurrent();
+
+                performWithoutOverlapsCheck(newRowStore, session, baseTable, null, data);
+            }
+            newData.beforeFirst();
+        }
+
         if (baseTable.triggerLists[Trigger.INSERT_BEFORE_ROW].length > 0) {
             while (newData.next()) {
                 Object[] data = newData.getCurrent();
@@ -923,14 +919,8 @@ public class StatementDML extends StatementDMQL {
             newData.beforeFirst();
         }
 
-        HashMap<List<Object>, List<TimestampData[]>> newRowStore = new HashMap<>();
-
         while (newData.next()) {
             Object[] data = newData.getCurrent();
-
-            if(targetTable.withoutOverlaps){
-                performWithoutOverlapsCheck(newRowStore, session, targetTable, null, data);
-            }
 
             // for identity using global sequence
             session.sessionData.startRowProcessing();
@@ -1092,7 +1082,8 @@ public class StatementDML extends StatementDMQL {
      */
     int update(Session session, Table table,
                RowSetNavigatorDataChange navigator,
-               RowSetNavigator generatedNavigator) {
+               RowSetNavigator generatedNavigator,
+               TimestampData[] portion) {
 
         int           rowCount      = navigator.getSize();
         RangeIterator checkIterator = null;
@@ -1138,6 +1129,18 @@ public class StatementDML extends StatementDMQL {
                 path.clear();
             }
 
+            navigator.beforeFirst();
+        }
+
+        if(table.withoutOverlaps){
+            HashMap<List<Object>, List<TimestampData[]>> newRowStore = new HashMap<>();
+            while (navigator.next()) {
+                Row             row          = navigator.getCurrentRow();
+                Object[]        data         = navigator.getCurrentChangedData();
+                Table           currentTable = ((Table) row.getTable());
+
+                performWithoutOverlapsCheck(newRowStore, session, currentTable, row.getData(), data);
+            }
             navigator.beforeFirst();
         }
 
@@ -1200,6 +1203,10 @@ public class StatementDML extends StatementDMQL {
                 Row newRow =
                     currentTable.insertSystemVersionHistoryRow(session, store,
                         history);
+            }
+
+            if (portion != null) {
+                data = handleForPortionOf(session, store, currentTable, row.getData(), data, portion);
             }
 
             if (data == null) {
@@ -1293,27 +1300,11 @@ public class StatementDML extends StatementDMQL {
 
         session.sessionContext.rownum = 1;
 
-        //application period - FOR PORTION OF
-        boolean for_portion_of = false;
-        TimestampData[] portion_values = new TimestampData[2];
-        if (targetRangeVariables[0].applicationPeriodCondition != null) {
-            for_portion_of = true;
-            portion_values[0] = (TimestampData) targetRangeVariables[0].applicationPeriodCondition.nodes[0].nodes[0].valueData;
-            portion_values[1] = (TimestampData) targetRangeVariables[0].applicationPeriodCondition.nodes[0].nodes[1].valueData;
-        }
-
         int rowCount = 0;
 
         while (it.next()) {
             Row currentRow = it.getCurrentRow();
             Object[] currentData = currentRow.getDataCopy();
-
-            //make inserts IF portion_values are not strictly equal to currentRow's period values
-            if (for_portion_of) {
-                Table currentTable    = (Table) currentRow.getTable();
-                PersistentStore store = currentTable.getRowStore(session);
-                currentTable.handleForPortionOf(session, store, currentData, portion_values);
-            }
 
             rowset.addRow(currentRow);
 
@@ -1328,8 +1319,16 @@ public class StatementDML extends StatementDMQL {
         it.release();
         rowset.endMainDataSet();
 
+        //application period - FOR PORTION OF
+        TimestampData[] portion = null;
+        if (targetRangeVariables[0].applicationPeriodCondition != null) {
+            portion = new TimestampData[2];
+            portion[0] = (TimestampData) targetRangeVariables[0].applicationPeriodCondition.nodes[0].nodes[0].valueData;
+            portion[1] = (TimestampData) targetRangeVariables[0].applicationPeriodCondition.nodes[0].nodes[1].valueData;
+        }
+
         if (rowset.getSize() > 0) {
-            count = delete(session, baseTable, rowset);
+            count = delete(session, baseTable, rowset, portion);
         } else {
             session.addWarning(HsqlException.noDataCondition);
 
@@ -1392,7 +1391,8 @@ public class StatementDML extends StatementDMQL {
      *  DELETE.
      */
     int delete(Session session, Table table,
-               RowSetNavigatorDataChange navigator) {
+               RowSetNavigatorDataChange navigator,
+               TimestampData[] portion) {
 
         int rowCount = navigator.getSize();
 
@@ -1464,6 +1464,10 @@ public class StatementDML extends StatementDMQL {
             Object[]        data         = navigator.getCurrentChangedData();
             Table           currentTable = ((Table) row.getTable());
             PersistentStore store        = currentTable.getRowStore(session);
+
+            if (portion != null) {
+                handleForPortionOf(session, store, currentTable, row.getData(), null, portion);
+            }
 
             session.addDeleteAction(currentTable, store, row, null);
 
@@ -1967,7 +1971,48 @@ public class StatementDML extends StatementDMQL {
         };
     }
 
+    /**
+     * Method for inserting splitted rows and returning newData row for application-time period table when updating/deleting FOR PERIOD OF some period.
+     */
+    Object[] handleForPortionOf(Session session, PersistentStore store, Table table,
+                                Object[] oldData, Object[] newData,
+                                TimestampData[] portion) {
+
+        if(newData == null){
+            newData = (Object[]) ArrayUtil.duplicateArray(oldData);
+        }
+
+        int applicationPeriodStartColumn = table.applicationPeriodStartColumn;
+        int applicationPeriodEndColumn   = table.applicationPeriodEndColumn;
+
+        TimestampData start = (TimestampData) oldData[applicationPeriodStartColumn];
+        TimestampData end   = (TimestampData) oldData[applicationPeriodEndColumn];
+
+        if (start.compareTo(portion[0]) == -1) {
+            newData[applicationPeriodStartColumn] = portion[0];
+
+            Object[] splitData = (Object[]) ArrayUtil.duplicateArray(oldData);
+            splitData[applicationPeriodEndColumn] = portion[0];
+
+            insertSingleRow(session, store, splitData);
+        }
+
+        if (end.compareTo(portion[1]) == 1) {
+            newData[applicationPeriodEndColumn] = portion[1];
+
+            Object[] splitData = (Object[]) ArrayUtil.duplicateArray(oldData);
+            splitData[applicationPeriodStartColumn] = portion[1];
+
+            insertSingleRow(session, store, splitData);
+        }
+
+        return newData;
+    }
+
+
     public void clearStructures(Session session) {
         session.sessionContext.clearStructures(this);
     }
 }
+
+

@@ -2911,42 +2911,6 @@ public class Table extends TableBase implements SchemaObject {
     }
 
     /**
-     * Method for inserting splitted rows and returning newData row for application-time period table when updating/deleting FOR PERIOD OF some period.
-     */
-    Object[] handleForPortionOf(Session session, PersistentStore store, Object[] data,
-                                TimestampData[] portion) {
-
-        TimestampData start = (TimestampData) data[applicationPeriodStartColumn];
-        TimestampData end   = (TimestampData) data[applicationPeriodEndColumn];
-
-        Object[] newData = (Object[]) ArrayUtil.duplicateArray(data);
-
-        if (start.compareTo(portion[0]) == -1) {
-            newData[applicationPeriodStartColumn] = portion[0];
-
-            Object[] splitData = (Object[]) ArrayUtil.duplicateArray(data);
-            splitData[applicationPeriodEndColumn] = portion[0];
-            //insert
-            generateAndCheckData(session, data);
-            Row row = (Row) store.getNewCachedObject(session, splitData, true);
-            session.database.txManager.addInsertAction(session, store, row);
-        }
-
-        if (end.compareTo(portion[1]) == 1) {
-            newData[applicationPeriodEndColumn] = portion[1];
-
-            Object[] splitData = (Object[]) ArrayUtil.duplicateArray(data);
-            splitData[applicationPeriodStartColumn] = portion[1];
-            //insert
-            generateAndCheckData(session, data);
-            Row row = (Row) store.getNewCachedObject(session, splitData, true);
-            session.database.txManager.addInsertAction(session, store, row);
-        }
-
-        return newData;
-    }
-
-    /**
      *
      */
     public void insertNoCheckFromLog(Session session, Object[] data) {
