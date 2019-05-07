@@ -813,7 +813,7 @@ public class ParserTable extends ParserDML {
         Table mainTable = (Table) database.schemaManager.getSchemaObject(mainTableName);
 
         if (token.tokenType == Tokens.OPENBRACKET) {
-            mainColSet = readColumnNames(mainTable);
+            mainColSet = readColumnNames(null, false, mainTable, true);
         }
 
         int matchType = OpTypes.MATCH_SIMPLE;
@@ -1502,7 +1502,7 @@ public class ParserTable extends ParserDML {
                             schemaObject.getName(), SchemaObject.CONSTRAINT);
                 }
 
-                OrderedHashSet set = readColumnNames((Table) schemaObject);
+                OrderedHashSet set = readColumnNames(null, false, (Table) schemaObject, true);
                 Constraint c =
                     new Constraint(constName, set,
                                    SchemaObject.ConstraintTypes.PRIMARY_KEY);
@@ -1524,7 +1524,7 @@ public class ParserTable extends ParserDML {
                     }
                 }
 
-                OrderedHashSet set = readColumnNames((Table) schemaObject);
+                OrderedHashSet set = readColumnNames(null, false, (Table) schemaObject, true);
 
                 if (constName == null) {
                     constName = database.nameManager.newAutoName("CT",
@@ -1548,7 +1548,7 @@ public class ParserTable extends ParserDML {
                 read();
                 readThis(Tokens.KEY);
 
-                OrderedHashSet set = readColumnNames((Table) schemaObject);
+                OrderedHashSet set = readColumnNames(null, false, (Table) schemaObject, false);
                 Constraint c = readFKReferences((Table) schemaObject,
                                                 constName, set);
 

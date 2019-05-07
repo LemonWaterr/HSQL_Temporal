@@ -253,8 +253,6 @@ public class TempTest {
                 "(22218,  'T1', 3, '2009-01-01', '2009-12-31')," +
                 "(21119,  'T2', 3, '2009-01-01', '2009-05-31')," +
                 "(21119,  'T3', 3, '2009-05-01', '2009-12-31')," +
-                //"(21120,  'F1', 3, '2008-12-31', '2009-05-31')," +
-                //"(21121,  'F2', 3, '2009-01-01', '2010-01-01')," +
                 "(30000, 'Seo', 4, '2011-07-01', '2011-12-31')";
         /*
         "(22218, 'Seo', 3, '2010-01-01', '2011-02-03')," +
@@ -272,7 +270,7 @@ public class TempTest {
         stmt.executeUpdate(createChild);
         stmt.executeUpdate(addParentRow);
         stmt.executeUpdate(addChildRow);
-        stmt.executeUpdate(deleteRow);
+        //stmt.executeUpdate(updateRow);
 
         stmt.close();
     }
@@ -368,7 +366,7 @@ public class TempTest {
     public static void main(String[] args) {
         TempTest test = new TempTest();
         try {
-            test.testPKInsert();
+            test.testFK();
             System.out.println("------------------------");
             test.selectAll();
             //test.TestAppQuery();

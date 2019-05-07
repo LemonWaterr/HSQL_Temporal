@@ -809,7 +809,7 @@ public class ParserDQL extends ParserBase {
     HsqlName[] readColumnNames(HsqlName tableName) {
 
         BitMap         quotedFlags = new BitMap(0, true);
-        OrderedHashSet set         = readColumnNames(quotedFlags, false, null);
+        OrderedHashSet set         = readColumnNames(quotedFlags, false);
         HsqlName[]     colList     = new HsqlName[set.size()];
 
         for (int i = 0; i < colList.length; i++) {
@@ -824,28 +824,85 @@ public class ParserDQL extends ParserBase {
     }
 
     OrderedHashSet readColumnNames(boolean readAscDesc) {
-        return readColumnNames(null, readAscDesc, null);
+        return readColumnNames(null, readAscDesc);
     }
 
-    //for Application Period Table DDL 'without overlaps' to set flag on table
-    OrderedHashSet readColumnNames(Table table) {
-        return readColumnNames(null, false, table);
-    }
-
-    OrderedHashSet readColumnNames(BitMap quotedFlags, boolean readAscDesc, Table table) {
+    OrderedHashSet readColumnNames(BitMap quotedFlags, boolean readAscDesc) {
 
         readThis(Tokens.OPENBRACKET);
 
         OrderedHashSet set = new OrderedHashSet();
 
-        readColumnNameList(set, quotedFlags, readAscDesc, table);
+        readColumnNameList(set, quotedFlags, readAscDesc);
+        readThis(Tokens.CLOSEBRACKET);
+
+        return set;
+    }
+
+    /**
+     * To read primary and foreign key column lists
+     * table and withoutOverlapsFlag needed for Application-time period table
+     */
+    OrderedHashSet readColumnNames(BitMap quotedFlags, boolean readAscDesc, Table table, boolean withoutOverlapsFlag) {
+
+        readThis(Tokens.OPENBRACKET);
+
+        OrderedHashSet set = new OrderedHashSet();
+
+        readColumnNameList(set, quotedFlags, readAscDesc, table, withoutOverlapsFlag);
         readThis(Tokens.CLOSEBRACKET);
 
         return set;
     }
 
     void readColumnNameList(OrderedHashSet set, BitMap quotedFlags,
-                            boolean readAscDesc, Table table) {
+                            boolean readAscDesc) {
+
+        int i = 0;
+
+        while (true) {
+            if (session.isProcessingScript()) {
+
+                // for old scripts
+                if (!isSimpleName()) {
+                    token.isDelimitedIdentifier = true;
+                }
+            } else {
+                checkIsSimpleName();
+            }
+
+            if (!set.add(token.tokenString)) {
+                throw Error.error(ErrorCode.X_42577, token.tokenString);
+            }
+
+            if (quotedFlags != null) {
+                quotedFlags.setValue(i, isDelimitedIdentifier());
+            }
+
+            read();
+
+            i++;
+
+            if (readAscDesc) {
+                if (token.tokenType == Tokens.ASC
+                        || token.tokenType == Tokens.DESC) {
+                    read();
+                }
+            }
+
+            if (readIfThis(Tokens.COMMA)) {
+                continue;
+            }
+
+            break;
+        }
+    }
+
+    /**
+     * For Application-time period table PK/FK
+     */
+    void readColumnNameList(OrderedHashSet set, BitMap quotedFlags,
+                            boolean readAscDesc, Table table, boolean withoutOverlapsFlag) {
 
         int i = 0;
 
@@ -886,6 +943,9 @@ public class ParserDQL extends ParserBase {
                 read();
 
                 if(readIfThis(Tokens.WITHOUT)){
+                    if(!withoutOverlapsFlag){
+                        throw unexpectedToken("WITHOUT");
+                    }
                     readThis(Tokens.OVERLAPS);
                     table.withoutOverlaps = true;
                 }
@@ -922,7 +982,7 @@ public class ParserDQL extends ParserBase {
         BitMap columnNameQuoted = new BitMap(0, true);
 
         readThis(Tokens.OPENBRACKET);
-        readColumnNameList(set, columnNameQuoted, false, null);
+        readColumnNameList(set, columnNameQuoted, false);
         readThis(Tokens.CLOSEBRACKET);
 
         SimpleName[] columnNameList = new SimpleName[set.size()];
@@ -6861,7 +6921,7 @@ public class ParserDQL extends ParserBase {
 
                     colNames = new OrderedHashSet();
 
-                    readColumnNameList(colNames, null, false, null);
+                    readColumnNameList(colNames, null, false);
                 }
 
                 if (database.sqlSyntaxOra) {
