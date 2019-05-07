@@ -110,23 +110,23 @@ public class TempTest {
         stmt.close();
     }
 
-    public synchronized void testUpdateForPeriodOf() throws SQLException{
+    public synchronized void testUpdateForPortionOf() throws SQLException{
         Statement stmt =  conn.createStatement();
 
         String init = "DROP TABLE Emp";
-        String createAppTable = "CREATE TABLE Emp (TrigOut VARCHAR(30) NULL, ENo INTEGER, EName VARCHAR(30), EStart DATE, EEnd DATE, PERIOD FOR EPeriod (EStart, EEnd), PRIMARY KEY(ENo, EPeriod WITHOUT OVERLAPS))";
+        String createAppTable = "CREATE TABLE Emp (TrigOut VARCHAR(30) NULL, ENo INTEGER, EName VARCHAR(30), EStart DATE, EEnd DATE, PERIOD FOR EPeriod (EStart, EEnd))";
 
         //String createTrigger = "CREATE TRIGGER testTrigInsert AFTER INSERT ON Emp FOR EACH ROW BEGIN ATOMIC INSERT INTO Emp VALUES ('trigger', 999, 'Trig',  '2011-01-01', '2011-02-01'); END";
 
         //T1~T4 should be properly updated, and F1~F4 should not be
         String addRow = "INSERT INTO Emp (TrigOut, ENo, EName, EStart, EEnd) VALUES ('none', 1, 'T1',  '2019-03-01', '2019-03-31')," +
-                                                                            "('none', 2, 'T2', '2019-03-01', '2019-04-10')," +
-                                                                            "('none', 3, 'T3', '2019-02-28', '2019-03-31')," +
-                                                                            "('none', 4, 'T4', '2019-02-28', '2019-04-10')," +
-                                                                            "('none', 5, 'F1', '2019-03-01', '2019-03-20')," +
-                                                                            "('none', 6, 'F2', '2019-03-10', '2019-03-31')," +
-                                                                            "('none', 7, 'F3', '2019-03-10', '2019-03-20')," +
-                                                                            "('none', 8, 'F4', '2019-05-01', '2019-05-31')";
+                "('none', 2, 'T2', '2019-03-01', '2019-04-10')," +
+                "('none', 3, 'T3', '2019-02-28', '2019-03-31')," +
+                "('none', 4, 'T4', '2019-02-28', '2019-04-10')," +
+                "('none', 5, 'F1', '2019-03-01', '2019-03-20')," +
+                "('none', 6, 'F2', '2019-03-10', '2019-03-31')," +
+                "('none', 7, 'F3', '2019-03-10', '2019-03-20')," +
+                "('none', 8, 'F4', '2019-05-01', '2019-05-31')";
         String updateRow = "UPDATE Emp FOR PORTION OF EPeriod FROM DATE '2019-03-01' TO DATE '2019-03-31' SET EName = 'Changed'";
 
         stmt.executeUpdate(init);
@@ -138,7 +138,7 @@ public class TempTest {
         stmt.close();
     }
 
-    public synchronized void testDeleteForPeriodOf() throws SQLException{
+    public synchronized void testDeleteForPortionOf() throws SQLException{
         Statement stmt =  conn.createStatement();
 
         String init = "DROP TABLE Emp";
@@ -176,26 +176,25 @@ public class TempTest {
 
         //T1~T4 should be properly updated, and F1~F4 should not be
         String addRow = "INSERT INTO Emp (Dummy, ENo, EName, EStart, EEnd) VALUES ('asdf', 1, 'T1',  '2019-02-01', '2019-02-28')," +
-                "('a', 1, 'T1',  '2015-02-01', '2016-02-01')," +
-                "('c', 1, 'T1',  '2017-02-01', '2018-02-01')," +
-                "('b', 1, 'T1',  '2016-02-01', '2017-02-01')," +
-
                 "('none', 2, 'T2', '2019-03-01', '2019-04-10')," +
                 "('asdf', 3, 'T3', '2019-02-01', '2019-02-15')," +
                 "('none', 4, 'T4', '2019-02-28', '2019-04-10')," +
                 "('none', 5, 'F1', '2019-03-01', '2019-03-20')," +
                 "('none', 6, 'F2', '2019-03-10', '2019-03-31')," +
                 "('none', 7, 'F3', '2019-03-10', '2019-03-20')," +
+
+                //"('viol', 1, 'T111', '2019-02-22', '2019-03-02')," +
+
                 "('none', 8, 'F4', '2019-05-01', '2019-05-31')";
 
         String addViolation = "INSERT INTO Emp (Dummy, ENo, EName, EStart, EEnd) VALUES ('none', 1, 'T11',  '2019-02-01', '2019-03-31')";
-        String updateRow = "UPDATE Emp SET Dummy='d' WHERE Dummy='c'";
+        String updateRow = "UPDATE Emp SET ENo=2 WHERE Dummy='asdf'";
 
         stmt.executeUpdate(init);
         stmt.executeUpdate(createAppTable);
         //stmt.executeUpdate(createTrigger);
         stmt.executeUpdate(addRow);
-        stmt.executeUpdate(addViolation);
+        //stmt.executeUpdate(addViolation);
         //stmt.executeUpdate(updateRow);
 
         stmt.close();
@@ -369,8 +368,7 @@ public class TempTest {
     public static void main(String[] args) {
         TempTest test = new TempTest();
         try {
-            test. testPKUpdate();
-            //test.testUpdateForPeriodOf();
+            test.testPKInsert();
             System.out.println("------------------------");
             test.selectAll();
             //test.TestAppQuery();

@@ -1900,7 +1900,7 @@ public class StatementDML extends StatementDMQL {
                 }
                 throw Error.error(ErrorCode.X_23505, msg);
             }
-
+            System.out.println("-----------------");
         }
     }
 
@@ -1924,7 +1924,7 @@ public class StatementDML extends StatementDMQL {
             List<TimestampData[]> periods = rowStore.get(key);
             for(TimestampData[] period : periods){
                 if(period[0].compareTo(period_data[1]) < 0 && period[1].compareTo(period_data[0]) > 0){
-                    String msg = "Period Without Overlaps condition violated trying to insert/update into (DateTime in seconds): ";
+                    String msg = "Period Without Overlaps condition violated in between new rows: ";
                     for(Object val : data){
                         if(val instanceof TimestampData){
                             msg += ((TimestampData) val).getSeconds();
