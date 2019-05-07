@@ -2,7 +2,8 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="f610f256-c444-427a-8905-80dbc63b0ccb" name="Default" comment="">
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/org/hsqldb/ParserTable.java" afterPath="$PROJECT_DIR$/src/org/hsqldb/ParserTable.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/org/hsqldb/ParserDQL.java" afterPath="$PROJECT_DIR$/src/org/hsqldb/ParserDQL.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/org/hsqldb/StatementDML.java" afterPath="$PROJECT_DIR$/src/org/hsqldb/StatementDML.java" />
     </list>
     <ignored path="$PROJECT_DIR$/out/" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -19,21 +20,11 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="375">
-      <file leaf-file-name="StatementDML.java" pinned="false" current-in-tab="false">
+      <file leaf-file-name="StatementDML.java" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/org/hsqldb/StatementDML.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-19626">
-              <caret line="1068" column="74" lean-forward="false" selection-start-line="1068" selection-start-column="74" selection-end-line="1068" selection-end-column="74" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="ParserDDL.java" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/org/hsqldb/ParserDDL.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="86">
-              <caret line="895" column="0" lean-forward="false" selection-start-line="895" selection-start-column="0" selection-end-line="895" selection-end-column="0" />
+            <state relative-caret-position="315">
+              <caret line="1893" column="13" lean-forward="false" selection-start-line="1893" selection-start-column="13" selection-end-line="1893" selection-end-column="13" />
               <folding />
             </state>
           </provider>
@@ -54,8 +45,8 @@
       <file leaf-file-name="ParserDQL.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/org/hsqldb/ParserDQL.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="72">
-              <caret line="845" column="24" lean-forward="false" selection-start-line="845" selection-start-column="19" selection-end-line="845" selection-end-column="34" />
+            <state relative-caret-position="-273">
+              <caret line="908" column="36" lean-forward="true" selection-start-line="908" selection-start-column="36" selection-end-line="908" selection-end-column="36" />
               <folding>
                 <element signature="e#26958#26959#0" expanded="true" />
                 <element signature="e#27015#27016#0" expanded="true" />
@@ -64,11 +55,11 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="ParserTable.java" pinned="false" current-in-tab="true">
+      <file leaf-file-name="ParserTable.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/org/hsqldb/ParserTable.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="316">
-              <caret line="815" column="70" lean-forward="false" selection-start-line="815" selection-start-column="70" selection-end-line="815" selection-end-column="70" />
+            <state relative-caret-position="164">
+              <caret line="661" column="66" lean-forward="false" selection-start-line="661" selection-start-column="40" selection-end-line="661" selection-end-column="66" />
               <folding />
             </state>
           </provider>
@@ -87,8 +78,8 @@
       <file leaf-file-name="Session.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/org/hsqldb/Session.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="514">
-              <caret line="1232" column="0" lean-forward="false" selection-start-line="1232" selection-start-column="0" selection-end-line="1232" selection-end-column="0" />
+            <state relative-caret-position="6494">
+              <caret line="1219" column="27" lean-forward="true" selection-start-line="1219" selection-start-column="27" selection-end-line="1219" selection-end-column="27" />
               <folding />
             </state>
           </provider>
@@ -97,8 +88,8 @@
       <file leaf-file-name="IndexAVL.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/org/hsqldb/index/IndexAVL.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="304">
-              <caret line="886" column="0" lean-forward="false" selection-start-line="886" selection-start-column="0" selection-end-line="888" selection-end-column="7" />
+            <state relative-caret-position="-43">
+              <caret line="741" column="38" lean-forward="false" selection-start-line="741" selection-start-column="38" selection-end-line="741" selection-end-column="38" />
               <folding />
             </state>
           </provider>
@@ -115,9 +106,6 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>store</find>
-      <find>setcolumnstructures</find>
-      <find>execu</find>
       <find>createtable</find>
       <find>setcolumnstru</find>
       <find>compileupdate</find>
@@ -137,14 +125,17 @@
       <find>executeupdate</find>
       <find>xreadpredicaterightpart</find>
       <find>precedes</find>
-      <find>addtableconstraint</find>
       <find>insert</find>
       <find>addtableconstraintdefinitions</find>
       <find>readcolumnlist</find>
-      <find>findnode</find>
-      <find>be the innermost sql</find>
       <find>readcolumnnames</find>
       <find>readcolumnnamelist</find>
+      <find>findnode</find>
+      <find>addTableConstraintDefinitions</find>
+      <find>addtableconstraint</find>
+      <find>be the innermost sql</find>
+      <find>createAndAddIndexStructure</find>
+      <find>compare</find>
     </findStrings>
   </component>
   <component name="Git.Settings">
@@ -169,7 +160,6 @@
         <option value="$PROJECT_DIR$/src/org/hsqldb/ParserDML.java" />
         <option value="$PROJECT_DIR$/src/org/hsqldb/RangeVariable.java" />
         <option value="$PROJECT_DIR$/src/org/hsqldb/index/Index.java" />
-        <option value="$PROJECT_DIR$/src/org/hsqldb/index/IndexAVL.java" />
         <option value="$PROJECT_DIR$/src/org/hsqldb/Constraint.java" />
         <option value="$PROJECT_DIR$/src/org/hsqldb/test/TestTemporal.java" />
         <option value="$PROJECT_DIR$/src/org/hsqldb/test/AllTests.java" />
@@ -178,11 +168,12 @@
         <option value="$PROJECT_DIR$/src/org/hsqldb/StatementInsert.java" />
         <option value="$PROJECT_DIR$/src/org/hsqldb/StatementResultUpdate.java" />
         <option value="$PROJECT_DIR$/src/org/hsqldb/Table.java" />
-        <option value="$PROJECT_DIR$/src/org/hsqldb/StatementDML.java" />
         <option value="$PROJECT_DIR$/src/org/hsqldb/ParserRoutine.java" />
-        <option value="$PROJECT_DIR$/src/org/hsqldb/ParserDQL.java" />
         <option value="$PROJECT_DIR$/src/org/hsqldb/TempTest.java" />
         <option value="$PROJECT_DIR$/src/org/hsqldb/ParserTable.java" />
+        <option value="$PROJECT_DIR$/src/org/hsqldb/ParserDQL.java" />
+        <option value="$PROJECT_DIR$/src/org/hsqldb/index/IndexAVL.java" />
+        <option value="$PROJECT_DIR$/src/org/hsqldb/StatementDML.java" />
       </list>
     </option>
   </component>
@@ -240,7 +231,7 @@
     <property name="project.structure.last.edited" value="Modules" />
     <property name="project.structure.proportion" value="0.15" />
     <property name="project.structure.side.proportion" value="0.2" />
-    <property name="SearchEverywhereHistoryKey" value="parserdql&#9;FILE&#9;file://D:/develop/HSQL_Tempoal/src/org/hsqldb/ParserDQL.java&#10;statementdml&#9;FILE&#9;file://D:/develop/HSQL_Tempoal/src/org/hsqldb/StatementDML.java&#10;indexavl&#9;FILE&#9;file://D:/develop/HSQL_Tempoal/src/org/hsqldb/index/IndexAVL.java&#10;indexavlme&#9;PSI&#9;JAVA://org.hsqldb.index.IndexAVLMemory&#10;transform&#9;PSI&#9;JAVA://org.hsqldb.ExpressionPeriodOp#transform&#10;expressionperiodop&#9;FILE&#9;file://D:/develop/HSQL_Tempoal/src/org/hsqldb/ExpressionPeriodOp.java&#10;xread&#9;PSI&#9;JAVA://org.hsqldb.ParserDQL#XreadBooleanTermOrNull&#10;tokens&#9;FILE&#9;file://D:/develop/HSQL_Tempoal/src/org/hsqldb/Tokens.java&#10;Tokens.&#9;FILE&#9;file://D:/develop/HSQL_Tempoal/src/org/hsqldb/Tokens.java&#10;execute&#9;PSI&#9;JAVA://org.hsqldb.Statement#execute&#10;parserdml&#9;FILE&#9;file://D:/develop/HSQL_Tempoal/src/org/hsqldb/ParserDML.java&#10;existsparent&#9;PSI&#9;JAVA://org.hsqldb.index.Index#existsParent&#10;executeupdate&#9;PSI&#9;JAVA://org.hsqldb.StatementDML#executeUpdateStatement&#10;rangevariable&#9;FILE&#9;file://D:/develop/HSQL_Tempoal/src/org/hsqldb/RangeVariable.java&#10;columnschema&#9;FILE&#9;file://D:/develop/HSQL_Tempoal/src/org/hsqldb/ColumnSchema.java&#10;expressionperiod&#9;FILE&#9;file://D:/develop/HSQL_Tempoal/src/org/hsqldb/ExpressionPeriod.java&#10;tab&#9;FILE&#9;file://D:/develop/HSQL_Tempoal/src/org/hsqldb/TablePeriodWorks.java&#10;tableperiodworkds&#9;null&#9;null&#10;tableper&#9;FILE&#9;file://D:/develop/HSQL_Tempoal/src/org/hsqldb/TablePeriodWorks.java&#10;tableperiodworks&#9;PSI&#9;JAVA://org.hsqldb.TablePeriodWorks&#10;period&#9;PSI&#9;JAVA://org.hsqldb.PeriodDefinition&#10;getapplica&#9;PSI&#9;JAVA://org.hsqldb.ColumnSchema#getApplicationPeriodType&#10;isapplicationperiodtable&#9;PSI&#9;JAVA://org.hsqldb.Table#isApplicationPeriodTable&#10;getapplicationp&#9;PSI&#9;JAVA://org.hsqldb.Table#getApplicationPeriod&#10;period_row_&#9;PSI&#9;JAVA://org.hsqldb.SchemaObject.PeriodSystemColumnType#PERIOD_ROW_END&#10;jdbcstate&#9;FILE&#9;file://D:/develop/HSQL_Tempoal/src/org/hsqldb/jdbc/JDBCStatement.java&#10;jdbcst&#9;FILE&#9;file://D:/develop/HSQL_Tempoal/src/org/hsqldb/jdbc/JDBCStatement.java&#10;session&#9;FILE&#9;file://D:/develop/HSQL_Tempoal/src/org/hsqldb/Session.java&#10;issystemversioned&#9;PSI&#9;JAVA://org.hsqldb.Table#isSystemVersioned&#10;readFK&#9;PSI&#9;JAVA://org.hsqldb.ParserTable#readFKReferences&#10;index&#9;FILE&#9;file://D:/develop/HSQL_Tempoal/src/org/hsqldb/index/Index.java&#10;constraint&#9;FILE&#9;file://D:/develop/HSQL_Tempoal/src/org/hsqldb/Constraint.java&#10;ConstraintCore&#9;PSI&#9;JAVA://org.hsqldb.ConstraintCore&#10;getschemaob&#9;PSI&#9;JAVA://org.hsqldb.SchemaManager#getSchemaObject&#10;error&#9;PSI&#9;JAVA://org.hsqldb.error.ErrorCode&#10;token&#9;FILE&#9;file://D:/develop/HSQL_Tempoal/src/org/hsqldb/Tokens.java&#10;optype&#9;FILE&#9;file://D:/develop/HSQL_Tempoal/src/org/hsqldb/OpTypes.java&#10;schema&#9;PSI&#9;JAVA://org.hsqldb.SchemaObject&#10;statementschema&#9;PSI&#9;JAVA://org.hsqldb.StatementSchemaDefinition&#10;action_ref&#9;PSI&#9;JAVA://org.hsqldb.TransactionManager#ACTION_REF&#10;persist&#9;PSI&#9;JAVA://org.hsqldb.persist.PersistentStore&#10;timestampdata&#9;FILE&#9;file://D:/develop/HSQL_Tempoal/src/org/hsqldb/types/TimestampData.java&#10;errorcode&#9;FILE&#9;file://D:/develop/HSQL_Tempoal/src/org/hsqldb/error/ErrorCode.java&#10;expressionlogical&#9;FILE&#9;file://D:/develop/HSQL_Tempoal/src/org/hsqldb/ExpressionLogical.java&#10;RANGE_CONTAINS&#9;PSI&#9;JAVA://org.hsqldb.OpTypes#RANGE_CONTAINS&#10;type&#9;FILE&#9;file://D:/develop/HSQL_Tempoal/src/org/hsqldb/types/NumberType.java&#10;ty&#9;FILE&#9;file://D:/develop/HSQL_Tempoal/src/org/hsqldb/types/CharacterType.java&#10;expressionvalue&#9;FILE&#9;file://D:/develop/HSQL_Tempoal/src/org/hsqldb/ExpressionValue.java&#10;optypes&#9;FILE&#9;file://D:/develop/HSQL_Tempoal/src/org/hsqldb/OpTypes.java&#10;errorcod&#9;PSI&#9;JAVA://org.hsqldb.error.ErrorCode" />
+    <property name="SearchEverywhereHistoryKey" value="indexavl&#9;FILE&#9;file://D:/develop/HSQL_Tempoal/src/org/hsqldb/index/IndexAVL.java&#10;parserdql&#9;FILE&#9;file://D:/develop/HSQL_Tempoal/src/org/hsqldb/ParserDQL.java&#10;statementdml&#9;FILE&#9;file://D:/develop/HSQL_Tempoal/src/org/hsqldb/StatementDML.java&#10;indexavlme&#9;PSI&#9;JAVA://org.hsqldb.index.IndexAVLMemory&#10;transform&#9;PSI&#9;JAVA://org.hsqldb.ExpressionPeriodOp#transform&#10;expressionperiodop&#9;FILE&#9;file://D:/develop/HSQL_Tempoal/src/org/hsqldb/ExpressionPeriodOp.java&#10;xread&#9;PSI&#9;JAVA://org.hsqldb.ParserDQL#XreadBooleanTermOrNull&#10;tokens&#9;FILE&#9;file://D:/develop/HSQL_Tempoal/src/org/hsqldb/Tokens.java&#10;Tokens.&#9;FILE&#9;file://D:/develop/HSQL_Tempoal/src/org/hsqldb/Tokens.java&#10;execute&#9;PSI&#9;JAVA://org.hsqldb.Statement#execute&#10;parserdml&#9;FILE&#9;file://D:/develop/HSQL_Tempoal/src/org/hsqldb/ParserDML.java&#10;existsparent&#9;PSI&#9;JAVA://org.hsqldb.index.Index#existsParent&#10;executeupdate&#9;PSI&#9;JAVA://org.hsqldb.StatementDML#executeUpdateStatement&#10;rangevariable&#9;FILE&#9;file://D:/develop/HSQL_Tempoal/src/org/hsqldb/RangeVariable.java&#10;columnschema&#9;FILE&#9;file://D:/develop/HSQL_Tempoal/src/org/hsqldb/ColumnSchema.java&#10;expressionperiod&#9;FILE&#9;file://D:/develop/HSQL_Tempoal/src/org/hsqldb/ExpressionPeriod.java&#10;tab&#9;FILE&#9;file://D:/develop/HSQL_Tempoal/src/org/hsqldb/TablePeriodWorks.java&#10;tableperiodworkds&#9;null&#9;null&#10;tableper&#9;FILE&#9;file://D:/develop/HSQL_Tempoal/src/org/hsqldb/TablePeriodWorks.java&#10;tableperiodworks&#9;PSI&#9;JAVA://org.hsqldb.TablePeriodWorks&#10;period&#9;PSI&#9;JAVA://org.hsqldb.PeriodDefinition&#10;getapplica&#9;PSI&#9;JAVA://org.hsqldb.ColumnSchema#getApplicationPeriodType&#10;isapplicationperiodtable&#9;PSI&#9;JAVA://org.hsqldb.Table#isApplicationPeriodTable&#10;getapplicationp&#9;PSI&#9;JAVA://org.hsqldb.Table#getApplicationPeriod&#10;period_row_&#9;PSI&#9;JAVA://org.hsqldb.SchemaObject.PeriodSystemColumnType#PERIOD_ROW_END&#10;jdbcstate&#9;FILE&#9;file://D:/develop/HSQL_Tempoal/src/org/hsqldb/jdbc/JDBCStatement.java&#10;jdbcst&#9;FILE&#9;file://D:/develop/HSQL_Tempoal/src/org/hsqldb/jdbc/JDBCStatement.java&#10;session&#9;FILE&#9;file://D:/develop/HSQL_Tempoal/src/org/hsqldb/Session.java&#10;issystemversioned&#9;PSI&#9;JAVA://org.hsqldb.Table#isSystemVersioned&#10;readFK&#9;PSI&#9;JAVA://org.hsqldb.ParserTable#readFKReferences&#10;index&#9;FILE&#9;file://D:/develop/HSQL_Tempoal/src/org/hsqldb/index/Index.java&#10;constraint&#9;FILE&#9;file://D:/develop/HSQL_Tempoal/src/org/hsqldb/Constraint.java&#10;ConstraintCore&#9;PSI&#9;JAVA://org.hsqldb.ConstraintCore&#10;getschemaob&#9;PSI&#9;JAVA://org.hsqldb.SchemaManager#getSchemaObject&#10;error&#9;PSI&#9;JAVA://org.hsqldb.error.ErrorCode&#10;token&#9;FILE&#9;file://D:/develop/HSQL_Tempoal/src/org/hsqldb/Tokens.java&#10;optype&#9;FILE&#9;file://D:/develop/HSQL_Tempoal/src/org/hsqldb/OpTypes.java&#10;schema&#9;PSI&#9;JAVA://org.hsqldb.SchemaObject&#10;statementschema&#9;PSI&#9;JAVA://org.hsqldb.StatementSchemaDefinition&#10;action_ref&#9;PSI&#9;JAVA://org.hsqldb.TransactionManager#ACTION_REF&#10;persist&#9;PSI&#9;JAVA://org.hsqldb.persist.PersistentStore&#10;timestampdata&#9;FILE&#9;file://D:/develop/HSQL_Tempoal/src/org/hsqldb/types/TimestampData.java&#10;errorcode&#9;FILE&#9;file://D:/develop/HSQL_Tempoal/src/org/hsqldb/error/ErrorCode.java&#10;expressionlogical&#9;FILE&#9;file://D:/develop/HSQL_Tempoal/src/org/hsqldb/ExpressionLogical.java&#10;RANGE_CONTAINS&#9;PSI&#9;JAVA://org.hsqldb.OpTypes#RANGE_CONTAINS&#10;type&#9;FILE&#9;file://D:/develop/HSQL_Tempoal/src/org/hsqldb/types/NumberType.java&#10;ty&#9;FILE&#9;file://D:/develop/HSQL_Tempoal/src/org/hsqldb/types/CharacterType.java&#10;expressionvalue&#9;FILE&#9;file://D:/develop/HSQL_Tempoal/src/org/hsqldb/ExpressionValue.java&#10;optypes&#9;FILE&#9;file://D:/develop/HSQL_Tempoal/src/org/hsqldb/OpTypes.java&#10;errorcod&#9;PSI&#9;JAVA://org.hsqldb.error.ErrorCode" />
   </component>
   <component name="RunDashboard">
     <option name="ruleStates">
@@ -773,14 +764,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/org/hsqldb/TableBase.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="310">
-          <caret line="373" column="39" lean-forward="false" selection-start-line="373" selection-start-column="31" selection-end-line="373" selection-end-column="39" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/org/hsqldb/SchemaObject.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="227">
@@ -855,14 +838,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/org/hsqldb/index/IndexAVL.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="304">
-          <caret line="886" column="0" lean-forward="false" selection-start-line="886" selection-start-column="0" selection-end-line="888" selection-end-column="7" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/org/hsqldb/ParserCommand.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="385">
@@ -871,34 +846,10 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/org/hsqldb/Session.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="514">
-          <caret line="1232" column="0" lean-forward="false" selection-start-line="1232" selection-start-column="0" selection-end-line="1232" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/org/hsqldb/ParserBase.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="178">
           <caret line="445" column="9" lean-forward="false" selection-start-line="445" selection-start-column="9" selection-end-line="445" selection-end-column="9" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/org/hsqldb/StatementDML.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-19626">
-          <caret line="1068" column="74" lean-forward="false" selection-start-line="1068" selection-start-column="74" selection-end-line="1068" selection-end-column="74" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/org/hsqldb/ParserDDL.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="86">
-          <caret line="895" column="0" lean-forward="false" selection-start-line="895" selection-start-column="0" selection-end-line="895" selection-end-column="0" />
           <folding />
         </state>
       </provider>
@@ -915,8 +866,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/org/hsqldb/ParserDQL.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="72">
-          <caret line="845" column="24" lean-forward="false" selection-start-line="845" selection-start-column="19" selection-end-line="845" selection-end-column="34" />
+        <state relative-caret-position="-273">
+          <caret line="908" column="36" lean-forward="true" selection-start-line="908" selection-start-column="36" selection-end-line="908" selection-end-column="36" />
           <folding>
             <element signature="e#26958#26959#0" expanded="true" />
             <element signature="e#27015#27016#0" expanded="true" />
@@ -924,10 +875,50 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/src/org/hsqldb/Session.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="6494">
+          <caret line="1219" column="27" lean-forward="true" selection-start-line="1219" selection-start-column="27" selection-end-line="1219" selection-end-column="27" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/org/hsqldb/ParserDDL.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="458">
+          <caret line="895" column="0" lean-forward="false" selection-start-line="895" selection-start-column="0" selection-end-line="895" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/org/hsqldb/TableBase.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="178">
+          <caret line="392" column="23" lean-forward="false" selection-start-line="392" selection-start-column="23" selection-end-line="392" selection-end-column="23" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/src/org/hsqldb/ParserTable.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="316">
-          <caret line="815" column="70" lean-forward="false" selection-start-line="815" selection-start-column="70" selection-end-line="815" selection-end-column="70" />
+        <state relative-caret-position="164">
+          <caret line="661" column="66" lean-forward="false" selection-start-line="661" selection-start-column="40" selection-end-line="661" selection-end-column="66" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/org/hsqldb/index/IndexAVL.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-43">
+          <caret line="741" column="38" lean-forward="false" selection-start-line="741" selection-start-column="38" selection-end-line="741" selection-end-column="38" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/org/hsqldb/StatementDML.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="315">
+          <caret line="1893" column="13" lean-forward="false" selection-start-line="1893" selection-start-column="13" selection-end-line="1893" selection-end-column="13" />
           <folding />
         </state>
       </provider>

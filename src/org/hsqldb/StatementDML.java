@@ -1879,14 +1879,6 @@ public class StatementDML extends StatementDMQL {
             TimestampData start = (TimestampData) data[table.applicationPeriodStartColumn];
             TimestampData end = (TimestampData) data[table.applicationPeriodEndColumn];
 
-            System.out.println("----------");
-            System.out.println(data[0]);
-            System.out.println(((TimestampData)newStart).getSeconds() + " " + ((TimestampData)newEnd).getSeconds());
-            System.out.println(((TimestampData)start).getSeconds() + " " + ((TimestampData)end).getSeconds());
-
-            System.out.println(start.compareTo(newEnd) < 0);
-            System.out.println(end.compareTo(newStart) > 0);
-
             //if overlaps
             if(start.compareTo(newEnd) < 0 && end.compareTo(newStart) > 0){
                 String msg = "Period Without Overlaps condition violated trying to insert/update into (DateTime in seconds): ";
@@ -1900,7 +1892,6 @@ public class StatementDML extends StatementDMQL {
                 }
                 throw Error.error(ErrorCode.X_23505, msg);
             }
-            System.out.println("-----------------");
         }
     }
 
