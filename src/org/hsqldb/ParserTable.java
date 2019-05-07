@@ -813,7 +813,7 @@ public class ParserTable extends ParserDML {
         Table mainTable = (Table) database.schemaManager.getSchemaObject(mainTableName);
 
         if (token.tokenType == Tokens.OPENBRACKET) {
-            mainColSet = readColumnNames(null, false, mainTable, true);
+            mainColSet = readColumnNames(null, false, mainTable, false);
         }
 
         int matchType = OpTypes.MATCH_SIMPLE;
