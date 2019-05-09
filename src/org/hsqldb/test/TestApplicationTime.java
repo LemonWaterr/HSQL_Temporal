@@ -254,7 +254,7 @@ public class TestApplicationTime extends TestBase{
         }
     }
 
-    public void testFKDeleteCascade() throws SQLException{
+    public void testFK() throws SQLException{
 
         //use different table
         stmt.execute("DROP TABLE Emp IF EXISTS CASCADE");
@@ -273,6 +273,7 @@ public class TestApplicationTime extends TestBase{
                 "(22218,  'T1', 3, '2007-01-01', '2007-12-31')," +
                 "(21119,  'T2', 3, '2009-01-01', '2009-05-31')," +
                 "(21119,  'T3', 3, '2009-05-01', '2009-12-31')," +
+                "(21119,  'T4', 3, '2011-05-01', '2011-12-31')," +
                 "(30000, 'Seo', 4, '2011-07-01', '2011-12-31')";
 
         String deleteRow = "DELETE FROM Dept WHERE DName = 'Test2'";
@@ -284,7 +285,13 @@ public class TestApplicationTime extends TestBase{
         stmt.executeUpdate(deleteRow);
 
         System.out.println("testFKDeleteCascade");
-        printTable("Emp",   "*","", 2);
+        printTable("Emp",   "*","", 3);
+
+        String updateRow = "UPDATE Dept SET DNo=5 WHERE DName = 'Test1'";
+        stmt.executeUpdate(updateRow);
+
+        System.out.println("testFKUpdateSetNull");
+        printTable("Emp",   "*","WHERE EDept IS NULL AND EStart IS NULL AND EEnd IS NULL", 1);
     }
 
 }

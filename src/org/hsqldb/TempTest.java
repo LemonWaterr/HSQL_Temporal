@@ -95,8 +95,16 @@ public class TempTest {
 
         System.out.println("---------------------------");
 
-        //ResultSet rs2 = stmt.executeQuery("SELECT * FROM Dept");
-        //dump(rs2);
+        stmt.close();
+    }
+
+    public synchronized void selectWhere(String table, String condition) throws SQLException{
+        Statement stmt =  conn.createStatement();
+
+        ResultSet rs = stmt.executeQuery("SELECT * FROM " + table + " WHERE " + condition);
+        dump(rs);
+
+        System.out.println("---------------------------");
 
         stmt.close();
     }
@@ -382,7 +390,7 @@ public class TempTest {
         try {
             test.testFK();
             System.out.println("------------------------");
-            test.selectAll("Emp");
+            test.selectWhere("Emp", "EDept IS NULL AND EStart IS NULL AND EEnd IS NULL");
             test.selectAll("Dept");
             test.shutdown();
         } catch (SQLException e1) {

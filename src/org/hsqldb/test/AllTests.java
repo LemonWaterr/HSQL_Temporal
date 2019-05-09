@@ -44,7 +44,7 @@ public class AllTests extends TestCase {
     public static Test suite() {
 
         TestSuite suite = new TestSuite();
-        /*
+
         suite.addTestSuite(org.hsqldb.test.TestCollation.class);
         suite.addTestSuite(org.hsqldb.test.TestDatabaseMetaData.class);
         suite.addTestSuite(org.hsqldb.test.TestDateTime.class);
@@ -65,11 +65,10 @@ public class AllTests extends TestCase {
         suite.addTestSuite(org.hsqldb.test.TestUpdatableResults.class);
         suite.addTestSuite(org.hsqldb.test.TestUpdatableResultSets.class);
         suite.addTestSuite(org.hsqldb.test.TestTriggers.class);
-        */
         suite.addTestSuite(org.hsqldb.test.TestApplicationTime.class);
 
         // Suites that extend TestCase
-        /*
+
         suite.addTestSuite(org.hsqldb.test.TestJDBCSavepoints.class);
         suite.addTestSuite(org.hsqldb.test.TestPreparedStatements.class);
         suite.addTestSuite(org.hsqldb.test.TestPreparedSubQueries.class);
@@ -77,7 +76,7 @@ public class AllTests extends TestCase {
         suite.addTestSuite(org.hsqldb.test.TestCascade.class);
         suite.addTestSuite(org.hsqldb.test.TestGroupByHaving.class);
         suite.addTestSuite(org.hsqldb.test.TestSqlPersistent.class);     // Sometimes hangs on Connection.close after SHUTDOWN problem
-        */
+
         return suite;
     }
 
