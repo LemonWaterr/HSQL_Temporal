@@ -209,14 +209,12 @@ public class TempTest {
                 "('none', 7, 'F3', '2019-03-10', '2019-03-20')," +
                 "('none', 8, 'F4', '2019-05-01', '2019-05-31')";
 
-        String addViolation = "INSERT INTO Emp (Dummy, ENo, EName, EStart, EEnd) VALUES ('none', 1, 'T11',  '2019-02-01', '2019-03-31')";
         String updateRow = "UPDATE Emp SET ENo=2 WHERE Dummy='asdf'";
 
         stmt.executeUpdate(init);
         stmt.executeUpdate(createAppTable);
         //stmt.executeUpdate(createTrigger);
         stmt.executeUpdate(addRow);
-        //stmt.executeUpdate(addViolation);
         //stmt.executeUpdate(updateRow);
 
         stmt.close();
@@ -271,14 +269,10 @@ public class TempTest {
                 "(4, 'QA',   '2011-06-01', '2011-12-31')";
 
         String addChildRow = "INSERT INTO Emp (ENo, EName, EDept, EStart, EEnd) VALUES " +
-                "(22218,  'T1', 3, '2009-01-01', '2009-12-31')," +
+                "(22218,  'T1', 3, '2007-01-01', '2007-12-31')," +
                 "(21119,  'T2', 3, '2009-01-01', '2009-05-31')," +
                 "(21119,  'T3', 3, '2009-05-01', '2009-12-31')," +
                 "(30000, 'Seo', 4, '2011-07-01', '2011-12-31')";
-        /*
-        "(22218, 'Seo', 3, '2010-01-01', '2011-02-03')," +
-        "(22218, 'Seo', 4, '2011-02-03', '2011-11-12')";
-        */
 
         String addViolation = "INSERT INTO Emp (ENo, EName, EDept, EStart, EEnd) VALUES (21120, 'F1', '2019-03-01', '2019-03-31')";
         String updateRow = "UPDATE Dept SET DNo=5 WHERE DNo=3";
@@ -290,7 +284,7 @@ public class TempTest {
         stmt.executeUpdate(createChild);
         stmt.executeUpdate(addParentRow);
         stmt.executeUpdate(addChildRow);
-        //stmt.executeUpdate(updateRow);
+        stmt.executeUpdate(updateRow);
 
         stmt.close();
     }
@@ -386,10 +380,10 @@ public class TempTest {
     public static void main(String[] args) {
         TempTest test = new TempTest();
         try {
-            test.testDeleteForPortionOf();
+            test.testFK();
             System.out.println("------------------------");
             test.selectAll("Emp");
-            test.selectAll("Trig");
+            test.selectAll("Dept");
             test.shutdown();
         } catch (SQLException e1) {
             e1.printStackTrace();

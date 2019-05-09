@@ -1706,7 +1706,7 @@ public class StatementDML extends StatementDMQL {
                     //if parent(this) period does not contain the child(ref) period
                     }else if(!(((TimestampData)row.getData()[table.applicationPeriodStartColumn]).compareTo((TimestampData)refRow.getData()[c.core.refTable.applicationPeriodStartColumn]) <= 0
                             && ((TimestampData)row.getData()[table.applicationPeriodEndColumn]).compareTo((TimestampData)refRow.getData()[c.core.refTable.applicationPeriodEndColumn]) >= 0)){
-                        break;
+                        continue;
                     }
                 }
 
