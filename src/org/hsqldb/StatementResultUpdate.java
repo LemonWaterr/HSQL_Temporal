@@ -154,7 +154,7 @@ public class StatementResultUpdate extends StatementDML {
                     data[baseColumnMap[i]] = args[i];
                 }
 
-                return insertSingleRow(session, store, data);
+                return insertSingleRow(session, store, data, null);
             }
         }
 

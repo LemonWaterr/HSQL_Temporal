@@ -967,7 +967,7 @@ public class StatementDML extends StatementDMQL {
     }
 
     Result insertSingleRow(Session session, PersistentStore store,
-                           Object[] data) {
+                           Object[] data, Row forApplicationTable) {
 
         session.sessionData.startRowProcessing();
         baseTable.setIdentityColumn(session, data);
@@ -978,7 +978,7 @@ public class StatementDML extends StatementDMQL {
         }
 
         if(targetTable.withoutOverlaps){
-            performWithoutOverlapsCheck(null, session, targetTable, null, data);
+            performWithoutOverlapsCheck(null, session, targetTable, forApplicationTable, data);
         }
 
         baseTable.insertSingleRow(session, store, data, null);
@@ -1207,7 +1207,7 @@ public class StatementDML extends StatementDMQL {
             }
 
             if (portion != null) {
-                data = handleForPortionOf(session, store, currentTable, row.getData(), data, portion);
+                data = handleForPortionOf(session, store, currentTable, row, data, portion);
             }
 
             if (data == null) {
@@ -1467,7 +1467,7 @@ public class StatementDML extends StatementDMQL {
             PersistentStore store        = currentTable.getRowStore(session);
 
             if (portion != null) {
-                handleForPortionOf(session, store, currentTable, row.getData(), null, portion);
+                handleForPortionOf(session, store, currentTable, row, null, portion);
             }
 
             session.addDeleteAction(currentTable, store, row, null);
@@ -1883,7 +1883,9 @@ public class StatementDML extends StatementDMQL {
             if(start.compareTo(newEnd) < 0 && end.compareTo(newStart) > 0){
                 String msg = "Period Without Overlaps condition violated trying to insert/update into (DateTime in seconds): ";
                 for(Object val : data){
-                    if(val instanceof TimestampData){
+                    if(val == null){
+                        msg += "null";
+                    }else if(val instanceof TimestampData){
                         msg += ((TimestampData) val).getSeconds();
                     }else{
                         msg += val.toString();
@@ -1943,8 +1945,10 @@ public class StatementDML extends StatementDMQL {
      * Method for inserting splitted rows and returning newData row for application-time period table when updating/deleting FOR PERIOD OF some period.
      */
     Object[] handleForPortionOf(Session session, PersistentStore store, Table table,
-                                Object[] oldData, Object[] newData,
+                                Row oldRow, Object[] newData,
                                 TimestampData[] portion) {
+
+        Object[] oldData = oldRow.getDataCopy();
 
         if(newData == null){
             newData = (Object[]) ArrayUtil.duplicateArray(oldData);
@@ -1962,7 +1966,7 @@ public class StatementDML extends StatementDMQL {
             Object[] splitData = (Object[]) ArrayUtil.duplicateArray(oldData);
             splitData[applicationPeriodEndColumn] = portion[0];
 
-            insertSingleRow(session, store, splitData);
+            insertSingleRow(session, store, splitData, oldRow);
         }
 
         if (end.compareTo(portion[1]) == 1) {
@@ -1971,7 +1975,7 @@ public class StatementDML extends StatementDMQL {
             Object[] splitData = (Object[]) ArrayUtil.duplicateArray(oldData);
             splitData[applicationPeriodStartColumn] = portion[1];
 
-            insertSingleRow(session, store, splitData);
+            insertSingleRow(session, store, splitData, oldRow);
         }
 
         return newData;

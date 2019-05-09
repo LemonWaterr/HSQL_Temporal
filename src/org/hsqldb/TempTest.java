@@ -87,10 +87,10 @@ public class TempTest {
     }
 
 
-    public synchronized void selectAll() throws SQLException{
+    public synchronized void selectAll(String table) throws SQLException{
         Statement stmt =  conn.createStatement();
 
-        ResultSet rs = stmt.executeQuery("SELECT * FROM Emp");
+        ResultSet rs = stmt.executeQuery("SELECT * FROM " + table);
         dump(rs);
 
         System.out.println("---------------------------");
@@ -113,26 +113,39 @@ public class TempTest {
     public synchronized void testUpdateForPortionOf() throws SQLException{
         Statement stmt =  conn.createStatement();
 
-        String init = "DROP TABLE Emp";
-        String createAppTable = "CREATE TABLE Emp (TrigOut VARCHAR(30) NULL, ENo INTEGER, EName VARCHAR(30), EStart DATE, EEnd DATE, PERIOD FOR EPeriod (EStart, EEnd))";
+        String init = "DROP TABLE Emp IF EXISTS";
+        String init2 = "DROP TABLE Trig IF EXISTS";
 
-        //String createTrigger = "CREATE TRIGGER testTrigInsert AFTER INSERT ON Emp FOR EACH ROW BEGIN ATOMIC INSERT INTO Emp VALUES ('trigger', 999, 'Trig',  '2011-01-01', '2011-02-01'); END";
+        String createAppTable = "CREATE TABLE Emp (Trig VARCHAR(30), ENo INTEGER, EName VARCHAR(30), EStart DATE, EEnd DATE, PERIOD FOR EPeriod (EStart, EEnd))";
+        String createTrigTable = "CREATE TABLE Trig (ENo INTEGER, Type VARCHAR(30))";
+
+        String createTrigger1 = "CREATE TRIGGER testTrigAfterInsert AFTER INSERT ON Emp REFERENCING NEW ROW AS newrow FOR EACH ROW INSERT INTO Trig(ENo, Type) VALUES (newrow.ENo, 'AFTER_INSERT')";
+        String createTrigger2 = "CREATE TRIGGER testTrigBeforeInsert BEFORE INSERT ON Emp REFERENCING NEW ROW AS newrow FOR EACH ROW SET newrow.Trig = 'BEFORE_INSERT'";
+        String createTrigger3 = "CREATE TRIGGER testTrigAfterUpdate AFTER UPDATE ON Emp REFERENCING NEW ROW AS newrow FOR EACH ROW INSERT INTO Trig(ENo, Type) VALUES (newrow.ENo, 'AFTER_UPDATE')";
+        String createTrigger4 = "CREATE TRIGGER testTrigBeforeUpdate BEFORE UPDATE ON Emp REFERENCING NEW ROW AS newrow FOR EACH ROW SET newrow.Trig = 'BEFORE_UPDATE'";
+        //BEGIN ATOMIC INSERT INTO Emp VALUES ('trigger', 999, 'Trig',  '2011-01-01', '2011-02-01'); END
 
         //T1~T4 should be properly updated, and F1~F4 should not be
-        String addRow = "INSERT INTO Emp (TrigOut, ENo, EName, EStart, EEnd) VALUES ('none', 1, 'T1',  '2019-03-01', '2019-03-31')," +
-                "('none', 2, 'T2', '2019-03-01', '2019-04-10')," +
-                "('none', 3, 'T3', '2019-02-28', '2019-03-31')," +
-                "('none', 4, 'T4', '2019-02-28', '2019-04-10')," +
-                "('none', 5, 'F1', '2019-03-01', '2019-03-20')," +
-                "('none', 6, 'F2', '2019-03-10', '2019-03-31')," +
-                "('none', 7, 'F3', '2019-03-10', '2019-03-20')," +
-                "('none', 8, 'F4', '2019-05-01', '2019-05-31')";
+        String addRow = "INSERT INTO Emp (ENo, EName, EStart, EEnd) VALUES " +
+                "(1, 'T1', '2019-03-01', '2019-03-31')," +
+                "(2, 'T2', '2019-03-01', '2019-04-10')," +
+                "(3, 'T3', '2019-02-28', '2019-03-31')," +
+                "(4, 'T4', '2019-02-28', '2019-04-10')," +
+                "(5, 'F1', '2019-03-01', '2019-03-20')," +
+                "(6, 'F2', '2019-03-10', '2019-03-31')," +
+                "(7, 'F3', '2019-03-10', '2019-03-20')," +
+                "(8, 'F4', '2019-05-01', '2019-05-31')";
         String updateRow = "UPDATE Emp FOR PORTION OF EPeriod FROM DATE '2019-03-01' TO DATE '2019-03-31' SET EName = 'Changed'";
 
         stmt.executeUpdate(init);
+        stmt.executeUpdate(init2);
         stmt.executeUpdate(createAppTable);
-        //stmt.executeUpdate(createTrigger);
+        stmt.executeUpdate(createTrigTable);
         stmt.executeUpdate(addRow);
+        stmt.executeUpdate(createTrigger1);
+        stmt.executeUpdate(createTrigger2);
+        stmt.executeUpdate(createTrigger3);
+        stmt.executeUpdate(createTrigger4);
         stmt.executeUpdate(updateRow);
 
         stmt.close();
@@ -141,26 +154,38 @@ public class TempTest {
     public synchronized void testDeleteForPortionOf() throws SQLException{
         Statement stmt =  conn.createStatement();
 
-        String init = "DROP TABLE Emp";
-        String createAppTable = "CREATE TABLE Emp (TrigOut VARCHAR(30) NULL, ENo INTEGER, EName VARCHAR(30), EStart DATE, EEnd DATE, PERIOD FOR EPeriod (EStart, EEnd))";
+        String init = "DROP TABLE Emp IF EXISTS";
+        String init2 = "DROP TABLE Trig IF EXISTS";
 
-        //String createTrigger = "CREATE TRIGGER testTrigInsert AFTER INSERT ON Emp FOR EACH ROW BEGIN ATOMIC INSERT INTO Emp VALUES ('trigger', 999, 'Trig',  '2011-01-01', '2011-02-01'); END";
+        String createAppTable = "CREATE TABLE Emp (Trig VARCHAR(30), ENo INTEGER, EName VARCHAR(30), EStart DATE, EEnd DATE, PERIOD FOR EPeriod (EStart, EEnd), PRIMARY KEY(ENo, EPeriod WITHOUT OVERLAPS))";
+        String createTrigTable = "CREATE TABLE Trig (ENo INTEGER, Type VARCHAR(30))";
+
+        String createTrigger1 = "CREATE TRIGGER testTrigAfterInsert AFTER INSERT ON Emp REFERENCING NEW ROW AS newrow FOR EACH ROW INSERT INTO Trig(ENo, Type) VALUES (newrow.ENo, 'AFTER_INSERT')";
+        String createTrigger2 = "CREATE TRIGGER testTrigBeforeInsert BEFORE INSERT ON Emp REFERENCING NEW ROW AS newrow FOR EACH ROW SET newrow.Trig = 'BEFORE_INSERT'";
+        String createTrigger3 = "CREATE TRIGGER testTrigAfterUpdate AFTER DELETE ON Emp REFERENCING OLD ROW AS oldrow FOR EACH ROW INSERT INTO Trig(ENo, Type) VALUES (oldrow.ENo, 'AFTER_DELETE')";
+
+        //BEGIN ATOMIC INSERT INTO Emp VALUES ('trigger', 999, 'Trig',  '2011-01-01', '2011-02-01'); END
 
         //T1~T4 should be properly updated, and F1~F4 should not be
-        String addRow = "INSERT INTO Emp (TrigOut, ENo, EName, EStart, EEnd) VALUES ('none', 1, 'T1',  '2019-03-01', '2019-03-31')," +
-                "('none', 2, 'T2', '2019-03-01', '2019-04-10')," +
-                "('none', 3, 'T3', '2019-02-28', '2019-03-31')," +
-                "('none', 4, 'T4', '2019-02-28', '2019-04-10')," +
-                "('none', 5, 'F1', '2019-03-01', '2019-03-20')," +
-                "('none', 6, 'F2', '2019-03-10', '2019-03-31')," +
-                "('none', 7, 'F3', '2019-03-10', '2019-03-20')," +
-                "('none', 8, 'F4', '2019-05-01', '2019-05-31')";
+        String addRow = "INSERT INTO Emp (ENo, EName, EStart, EEnd) VALUES " +
+                "(1, 'T1', '2019-03-01', '2019-03-31')," +
+                "(2, 'T2', '2019-03-01', '2019-04-10')," +
+                "(3, 'T3', '2019-02-28', '2019-03-31')," +
+                "(4, 'T4', '2019-02-28', '2019-04-10')," +
+                "(5, 'F1', '2019-03-01', '2019-03-20')," +
+                "(6, 'F2', '2019-03-10', '2019-03-31')," +
+                "(7, 'F3', '2019-03-10', '2019-03-20')," +
+                "(8, 'F4', '2019-05-01', '2019-05-31')";
         String deleteRow = "DELETE FROM Emp FOR PORTION OF EPeriod FROM DATE '2019-03-01' TO DATE '2019-03-31'";
 
         stmt.executeUpdate(init);
+        stmt.executeUpdate(init2);
         stmt.executeUpdate(createAppTable);
-        //stmt.executeUpdate(createTrigger);
+        stmt.executeUpdate(createTrigTable);
         stmt.executeUpdate(addRow);
+        stmt.executeUpdate(createTrigger1);
+        stmt.executeUpdate(createTrigger2);
+        stmt.executeUpdate(createTrigger3);
         stmt.executeUpdate(deleteRow);
 
         stmt.close();
@@ -170,21 +195,18 @@ public class TempTest {
         Statement stmt =  conn.createStatement();
 
         String init = "DROP TABLE Emp";
-        String createAppTable = "CREATE TABLE Emp (Dummy VARCHAR(30) NULL, ENo INTEGER, EName VARCHAR(30), EStart DATE, EEnd DATE, PERIOD FOR EPeriod (EStart, EEnd), PRIMARY KEY(ENo, EPERIOD WITHOUT OVERLAPS))";
+        String createAppTable = "CREATE TABLE Emp (ENo INTEGER, EName VARCHAR(30), EStart DATE, EEnd DATE, PERIOD FOR EPeriod (EStart, EEnd), PRIMARY KEY(ENo, EPERIOD WITHOUT OVERLAPS))";
 
         //String createTrigger = "CREATE TRIGGER testTrigInsert AFTER INSERT ON Emp FOR EACH ROW BEGIN ATOMIC INSERT INTO Emp VALUES ('trigger', 999, 'Trig',  '2011-01-01', '2011-02-01'); END";
 
         //T1~T4 should be properly updated, and F1~F4 should not be
-        String addRow = "INSERT INTO Emp (Dummy, ENo, EName, EStart, EEnd) VALUES ('asdf', 1, 'T1',  '2019-02-01', '2019-02-28')," +
+        String addRow = "INSERT INTO Emp (ENo, EName, EStart, EEnd) VALUES ('asdf', 1, 'T1',  '2019-02-01', '2019-02-28')," +
                 "('none', 2, 'T2', '2019-03-01', '2019-04-10')," +
                 "('asdf', 3, 'T3', '2019-02-01', '2019-02-15')," +
                 "('none', 4, 'T4', '2019-02-28', '2019-04-10')," +
                 "('none', 5, 'F1', '2019-03-01', '2019-03-20')," +
                 "('none', 6, 'F2', '2019-03-10', '2019-03-31')," +
                 "('none', 7, 'F3', '2019-03-10', '2019-03-20')," +
-
-                //"('viol', 1, 'T111', '2019-02-22', '2019-03-02')," +
-
                 "('none', 8, 'F4', '2019-05-01', '2019-05-31')";
 
         String addViolation = "INSERT INTO Emp (Dummy, ENo, EName, EStart, EEnd) VALUES ('none', 1, 'T11',  '2019-02-01', '2019-03-31')";
@@ -235,9 +257,8 @@ public class TempTest {
     public synchronized void testFK() throws SQLException{
         Statement stmt =  conn.createStatement();
 
-        String init =  "Alter TABLE Emp DROP CONSTRAINT FK_test";
-        String init2 = "DROP TABLE Dept";
-        String init3 = "DROP TABLE Emp";
+        String init = "DROP TABLE Dept IF EXISTS CASCADE";
+        String init2 = "DROP TABLE Emp IF EXISTS CASCADE";
 
         String createParent = "CREATE TABLE Dept (DNo INTEGER, DName VARCHAR(30), DStart DATE, DEnd DATE, Period FOR DPeriod (DStart, DEnd), PRIMARY KEY(DNo, DPERIOD))";
         String createChild = "CREATE TABLE Emp (ENo INTEGER, EName VARCHAR(30), EDept INTEGER, EStart DATE, EEnd DATE, PERIOD FOR EPeriod (EStart, EEnd), CONSTRAINT FK_test FOREIGN KEY (EDept, PERIOD EPeriod) REFERENCES Dept (DNo, PERIOD DPeriod) ON DELETE CASCADE ON UPDATE SET NULL)";
@@ -265,7 +286,6 @@ public class TempTest {
 
         stmt.executeUpdate(init);
         stmt.executeUpdate(init2);
-        stmt.executeUpdate(init3);
         stmt.executeUpdate(createParent);
         stmt.executeUpdate(createChild);
         stmt.executeUpdate(addParentRow);
@@ -366,10 +386,10 @@ public class TempTest {
     public static void main(String[] args) {
         TempTest test = new TempTest();
         try {
-            test.testFK();
+            test.testDeleteForPortionOf();
             System.out.println("------------------------");
-            test.selectAll();
-            //test.TestAppQuery();
+            test.selectAll("Emp");
+            test.selectAll("Trig");
             test.shutdown();
         } catch (SQLException e1) {
             e1.printStackTrace();

@@ -151,7 +151,7 @@ public class StatementInsert extends StatementDML {
             Object[] data = getInsertData(session, colTypes,
                                           insertExpression.nodes[0].nodes);
 
-            return insertSingleRow(session, store, data);
+            return insertSingleRow(session, store, data, null);
         }
 
         RowSetNavigator newDataNavigator = queryExpression == null
