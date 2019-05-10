@@ -1,2 +1,7 @@
 /out/*
 Test.lck
+.idea/artifacts/HSQL_Tempoal_jar.xml
+data/test.properties
+data/test.script
+lib/META-INF/MANIFEST.MF
+src/META-INF/MANIFEST.MF

@@ -212,7 +212,7 @@ public class StatementInsert extends StatementDML {
 
         if (specialAction == StatementInsert.isReplace
                 && changeNavigator != null) {
-            count = update(session, baseTable, changeNavigator, null, null);
+            count = update(session, baseTable, changeNavigator, null);
 
             changeNavigator.endMainDataSet();
         } else if (specialAction == StatementInsert.isUpdate
@@ -235,7 +235,7 @@ public class StatementInsert extends StatementDML {
                 session.sessionContext.rownum++;
             }
 
-            count = update(session, baseTable, changeNavigator, null, null);
+            count = update(session, baseTable, changeNavigator, null);
 
             changeNavigator.endMainDataSet();
         }

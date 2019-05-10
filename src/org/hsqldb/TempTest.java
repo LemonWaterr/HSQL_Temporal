@@ -388,10 +388,10 @@ public class TempTest {
     public static void main(String[] args) {
         TempTest test = new TempTest();
         try {
-            test.testFK();
+            test.testSimple();
             System.out.println("------------------------");
-            test.selectWhere("Emp", "EDept IS NULL AND EStart IS NULL AND EEnd IS NULL");
-            test.selectAll("Dept");
+            //test.selectWhere("Emp", "EDept IS NULL AND EStart IS NULL AND EEnd IS NULL");
+            test.selectAll("Emp");
             test.shutdown();
         } catch (SQLException e1) {
             e1.printStackTrace();

@@ -548,6 +548,14 @@ public class StatementDML extends StatementDMQL {
 
         session.sessionContext.rownum = 1;
 
+        //application period - FOR PORTION OF
+        TimestampData[] portion = null;
+        if (targetRangeVariables[0].applicationPeriodCondition != null) {
+            portion = new TimestampData[2];
+            portion[0] = (TimestampData) targetRangeVariables[0].applicationPeriodCondition.nodes[0].nodes[0].valueData;
+            portion[1] = (TimestampData) targetRangeVariables[0].applicationPeriodCondition.nodes[0].nodes[1].valueData;
+        }
+
         int rowCount = 0;
 
         while (it.next()) {
@@ -555,6 +563,12 @@ public class StatementDML extends StatementDMQL {
 
             Row      row     = it.getCurrentRow();
             Object[] newData = row.getDataCopy();
+
+            if (portion != null) {
+                Table currentTable    = (Table) row.getTable();
+                PersistentStore store = currentTable.getRowStore(session);
+                newData = handleForPortionOf(session, store, currentTable, row, newData, portion);
+            }
 
             getUpdatedData(session, targets, baseTable, updateColumnMap,
                            updateExpressions, colTypes, newData);
@@ -583,15 +597,7 @@ public class StatementDML extends StatementDMQL {
 //* debug 190 */
         rowset.beforeFirst();
 
-        //application period - FOR PORTION OF
-        TimestampData[] portion = null;
-        if (targetRangeVariables[0].applicationPeriodCondition != null) {
-            portion = new TimestampData[2];
-            portion[0] = (TimestampData) targetRangeVariables[0].applicationPeriodCondition.nodes[0].nodes[0].valueData;
-            portion[1] = (TimestampData) targetRangeVariables[0].applicationPeriodCondition.nodes[0].nodes[1].valueData;
-        }
-
-        count = update(session, baseTable, rowset, generatedNavigator, portion);
+        count = update(session, baseTable, rowset, generatedNavigator);
 
         if (resultOut == null) {
             if (count == 1) {
@@ -836,7 +842,7 @@ public class StatementDML extends StatementDMQL {
         // update any matched rows
         if (hasWhenMatched) {
             count = update(session, baseTable, updateRowSet,
-                           generatedNavigator, null);
+                           generatedNavigator);
         }
 
         // insert any non-matched rows
@@ -1083,8 +1089,7 @@ public class StatementDML extends StatementDMQL {
      */
     int update(Session session, Table table,
                RowSetNavigatorDataChange navigator,
-               RowSetNavigator generatedNavigator,
-               TimestampData[] portion) {
+               RowSetNavigator generatedNavigator) {
 
         int           rowCount      = navigator.getSize();
         RangeIterator checkIterator = null;
@@ -1206,10 +1211,6 @@ public class StatementDML extends StatementDMQL {
                         history);
             }
 
-            if (portion != null) {
-                data = handleForPortionOf(session, store, currentTable, row, data, portion);
-            }
-
             if (data == null) {
                 continue;
             }
@@ -1301,11 +1302,26 @@ public class StatementDML extends StatementDMQL {
 
         session.sessionContext.rownum = 1;
 
+        //application period - FOR PORTION OF
+        TimestampData[] portion = null;
+        if (targetRangeVariables[0].applicationPeriodCondition != null) {
+            portion = new TimestampData[2];
+            portion[0] = (TimestampData) targetRangeVariables[0].applicationPeriodCondition.nodes[0].nodes[0].valueData;
+            portion[1] = (TimestampData) targetRangeVariables[0].applicationPeriodCondition.nodes[0].nodes[1].valueData;
+        }
+
         int rowCount = 0;
 
         while (it.next()) {
             Row currentRow = it.getCurrentRow();
             Object[] currentData = currentRow.getDataCopy();
+
+            if (portion != null) {
+                Table currentTable    = (Table) currentRow.getTable();
+                PersistentStore store = currentTable.getRowStore(session);
+                currentData = handleForPortionOf(session, store, currentTable, currentRow, currentData, portion);
+                currentRow.rowData = currentData;
+            }
 
             rowset.addRow(currentRow);
 
@@ -1319,14 +1335,6 @@ public class StatementDML extends StatementDMQL {
 
         it.release();
         rowset.endMainDataSet();
-
-        //application period - FOR PORTION OF
-        TimestampData[] portion = null;
-        if (targetRangeVariables[0].applicationPeriodCondition != null) {
-            portion = new TimestampData[2];
-            portion[0] = (TimestampData) targetRangeVariables[0].applicationPeriodCondition.nodes[0].nodes[0].valueData;
-            portion[1] = (TimestampData) targetRangeVariables[0].applicationPeriodCondition.nodes[0].nodes[1].valueData;
-        }
 
         if (rowset.getSize() > 0) {
             count = delete(session, baseTable, rowset, portion);
