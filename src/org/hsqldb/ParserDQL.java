@@ -907,7 +907,7 @@ public class ParserDQL extends ParserBase {
         int i = 0;
 
         String appPeriodName = null;
-        if(table.isApplicationPeriodTable()){
+        if(table != null && table.isApplicationPeriodTable()){
             appPeriodName = table.getApplicationPeriod().periodName.name;
         }
 

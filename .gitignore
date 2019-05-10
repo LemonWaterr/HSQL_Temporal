@@ -5,3 +5,10 @@ data/test.properties
 data/test.script
 lib/META-INF/MANIFEST.MF
 src/META-INF/MANIFEST.MF
+testdb.script
+testdb.properties
+testdb.data
+test.script
+test.properties
+test.data
+.idea/workspace.xml

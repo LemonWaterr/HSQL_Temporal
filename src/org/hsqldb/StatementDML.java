@@ -1927,7 +1927,9 @@ public class StatementDML extends StatementDMQL {
                 if(period[0].compareTo(period_data[1]) < 0 && period[1].compareTo(period_data[0]) > 0){
                     String msg = "Period Without Overlaps condition violated in between new rows: ";
                     for(Object val : data){
-                        if(val instanceof TimestampData){
+                        if(val == null){
+                            msg += "null";
+                        }else if(val instanceof TimestampData){
                             msg += ((TimestampData) val).getSeconds();
                         }else{
                             msg += val.toString();

@@ -165,7 +165,7 @@ public class TestApplicationTime extends TestBase{
     public void testPKInsert2() throws SQLException{
         stmt =  conn.createStatement();
 
-        String addViolation = "INSERT INTO Emp (ENo, EName, EStart, EEnd) VALUES (9, 'F91',  '2019-02-01', '2019-03-01'), (9, 'F92',  '2019-02-31', '2019-04-01')";
+        String addViolation = "INSERT INTO Emp (ENo, EName, EStart, EEnd) VALUES (9, 'F91',  '2019-02-01', '2019-03-01'), (9, 'F92',  '2019-02-28', '2019-04-01')";
 
         try{
             stmt.executeUpdate(addViolation);
@@ -184,13 +184,13 @@ public class TestApplicationTime extends TestBase{
         String addRow = "INSERT INTO Emp (ENo, EName, EStart, EEnd) VALUES " +
                 "(1, 'T1',  '2019-02-01', '2019-02-28')," +
                 "(2, 'T2', '2019-03-01', '2019-04-10')," +
-                "(3, 'T3', '2019-02-01', '2019-02-15'),";
+                "(3, 'T3', '2019-02-01', '2019-02-15')";
         stmt.executeUpdate(addRow);
 
-        String updateRow = "UPDATE Emp SET ENo = 2 WHERE EName = 'T1''";
+        String updateRow = "UPDATE Emp SET ENo = 2 WHERE EName = 'T1'";
         stmt.executeUpdate(updateRow); //this should work fine
 
-        String updateViolation = "UPDATE Emp SET ENo = 2 WHERE EName = 'T2'";
+        String updateViolation = "UPDATE Emp SET ENo = 2 WHERE EName = 'T3'";
 
         try{
             stmt.executeUpdate(updateViolation);
@@ -209,10 +209,10 @@ public class TestApplicationTime extends TestBase{
         String addRow = "INSERT INTO Emp (ENo, EName, EStart, EEnd) VALUES " +
                 "(1, 'T1',  '2019-02-01', '2019-02-28')," +
                 "(2, 'T2', '2019-03-01', '2019-04-10')," +
-                "(3, 'T3', '2019-02-01', '2019-02-15'),";
+                "(3, 'T3', '2019-02-01', '2019-02-15')";
         stmt.executeUpdate(addRow);
 
-        String updateViolation = "UPDATE Emp SET ENo = 2 WHERE EName = 'T1' OR EName = 'T2''";
+        String updateViolation = "UPDATE Emp SET ENo = 2 WHERE EName = 'T1' OR EName = 'T3'";
 
         try{
             stmt.executeUpdate(updateViolation);
